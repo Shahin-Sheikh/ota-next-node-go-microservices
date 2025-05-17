@@ -62,7 +62,14 @@ const login = async (req, res) => {
       message: "Login successful",
       accessToken,
       refreshToken,
-      data: { id: user._id, email: user.email },
+      data: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        dob: user.dob,
+      },
     });
   } catch (err) {
     res.status(500).json({ message: "Login failed", error: err.message });
