@@ -16,12 +16,12 @@ const generateRefreshToken = (user) => {
 
 const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, phone, firstName, lastName, dob } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const user = new User({ email, password });
+    const user = new User({ email, password, phone, firstName, lastName, dob });
     await user.save();
 
     const accessToken = generateAccessToken(user);
@@ -31,7 +31,14 @@ const register = async (req, res) => {
       message: "User registered successfully",
       accessToken,
       refreshToken,
-      user: { id: user._id, email: user.email },
+      data: {
+        id: user._id,
+        email: user.email,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        dob: user.dob,
+      },
     });
   } catch (err) {
     res
@@ -55,7 +62,7 @@ const login = async (req, res) => {
       message: "Login successful",
       accessToken,
       refreshToken,
-      user: { id: user._id, email: user.email },
+      data: { id: user._id, email: user.email },
     });
   } catch (err) {
     res.status(500).json({ message: "Login failed", error: err.message });
@@ -80,7 +87,7 @@ const refreshAccessToken = (req, res) => {
 
 const getMe = async (req, res) => {
   res.status(200).json({
-    user: {
+    data: {
       id: req.user.id,
       email: req.user.email,
     },
