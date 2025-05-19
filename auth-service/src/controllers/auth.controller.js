@@ -1,22 +1,21 @@
-const User = require("../models/user");
+const User = require("../models/user.model");
+const Service = require("../models/service.model"); // assumes you have a separate collection for services
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const VALID_SERVICE_TYPES = ["admin", "customer", "hotel"]; // Add your valid types
-
-const generateAccessToken = (user, serviceType) => {
+const generateAccessToken = (user, serviceCode) => {
   return jwt.sign(
-    { id: user._id, email: user.email, serviceType },
+    { id: user._id, email: user.email, serviceCode },
     process.env.JWT_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m" }
   );
 };
 
-const generateRefreshToken = (user, serviceType) => {
+const generateRefreshToken = (user, serviceCode) => {
   return jwt.sign(
     {
       id: user._id,
-      serviceType,
+      serviceCode,
     },
     process.env.JWT_REFRESH_SECRET,
     {
@@ -25,14 +24,20 @@ const generateRefreshToken = (user, serviceType) => {
   );
 };
 
-// Only allow "customer" type for public registration
+// Register controller
 const register = async (req, res) => {
   try {
-    const { email, password, phone, firstName, lastName, dob } = req.body;
+    const { email, password, phone, firstName, lastName, dob, serviceSecret } =
+      req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
+    }
+
+    const service = await Service.findOne({ secret: serviceSecret });
+    if (!service) {
+      return res.status(403).json({ message: "Invalid service secret" });
     }
 
     const user = new User({
@@ -42,13 +47,13 @@ const register = async (req, res) => {
       firstName,
       lastName,
       dob,
-      serviceTypes: ["customer"], // set default service role
+      serviceSecret,
     });
 
     await user.save();
 
-    const accessToken = generateAccessToken(user, "customer");
-    const refreshToken = generateRefreshToken(user, "customer");
+    const accessToken = generateAccessToken(user, service.code);
+    const refreshToken = generateRefreshToken(user, service.code);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -70,12 +75,9 @@ const register = async (req, res) => {
   }
 };
 
+// Login controller
 const login = async (req, res) => {
-  const { email, password, serviceType } = req.body;
-
-  if (!VALID_SERVICE_TYPES.includes(serviceType)) {
-    return res.status(400).json({ message: "Invalid service type" });
-  }
+  const { email, password, serviceSecret } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -83,13 +85,18 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Check if user has this service access
-    if (!user.serviceTypes.includes(serviceType)) {
+    const service = await Service.findOne({ secret: serviceSecret });
+    if (!service) {
+      return res.status(403).json({ message: "Invalid service secret" });
+    }
+
+    // Validate if this user belongs to the given service
+    if (user.serviceSecret !== serviceSecret) {
       return res.status(403).json({ message: "Unauthorized for this service" });
     }
 
-    const accessToken = generateAccessToken(user, serviceType);
-    const refreshToken = generateRefreshToken(user, serviceType);
+    const accessToken = generateAccessToken(user, service.code);
+    const refreshToken = generateRefreshToken(user, service.code);
 
     res.status(200).json({
       message: "Login successful",
@@ -120,7 +127,7 @@ const refreshAccessToken = (req, res) => {
     const accessToken = jwt.sign(
       {
         id: decoded.id,
-        serviceType: decoded.serviceType,
+        serviceCode: decoded.serviceCode,
       },
       process.env.JWT_SECRET,
       {
@@ -138,7 +145,7 @@ const getMe = async (req, res) => {
     data: {
       id: req.user.id,
       email: req.user.email,
-      serviceType: req.user.serviceType,
+      serviceCode: req.user.serviceCode,
     },
   });
 };

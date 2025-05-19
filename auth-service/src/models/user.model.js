@@ -26,10 +26,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6,
   },
-  serviceTypes: {
-    type: [String],
-    enum: ["admin", "customer", "hotel"],
-    default: ["customer"],
+  serviceSecret: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,
