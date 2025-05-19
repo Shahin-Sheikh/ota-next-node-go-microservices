@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-
-module.exports = function authenticateToken(req, res, next) {
+function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -16,4 +15,6 @@ module.exports = function authenticateToken(req, res, next) {
   } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token" });
   }
-};
+}
+
+module.exports = authenticateToken;

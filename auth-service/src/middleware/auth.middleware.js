@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-const VALID_SERVICE_TYPES = ["admin", "customer", "hotel"]; // centralize this if used elsewhere
-
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
   if (!token) {
@@ -22,7 +20,5 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ message: "Token is not valid", error: err.message });
   }
 };
-
-module.exports = authMiddleware;
 
 module.exports = authMiddleware;

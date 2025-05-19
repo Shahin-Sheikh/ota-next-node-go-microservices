@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use("/api/products", productRoutes);
 
-const PORT = process.env.PORT || 4002;
+const PORT = process.env.PORT || 3010;
 
 sequelize.sync({ alter: true }).then(() => {
   console.log("Database synced");
