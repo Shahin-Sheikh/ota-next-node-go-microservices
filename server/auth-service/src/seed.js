@@ -5,7 +5,7 @@ const User = require("./models/user.model");
 const UserService = require("./models/user-service.model");
 
 const MONGODB_URI =
-  "MONGO_URI=mongodb+srv://root:1234@cluster0.zqqkmng.mongodb.net/ota-auth-db";
+  "mongodb+srv://root:1234@cluster0.zqqkmng.mongodb.net/ota-auth-db";
 
 async function seedData() {
   try {
