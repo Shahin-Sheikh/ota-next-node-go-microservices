@@ -91,7 +91,26 @@ const AuthController = {
         serviceSecret,
       } = sanitizedInput;
 
-      // Service verification by code (no secret required)
+      console.log("Register input:", {
+        email,
+        password,
+        phone,
+        firstName,
+        lastName,
+        dob,
+        serviceSecret,
+      }); // Log input
+
+      // Validate password presence and length
+      if (!password || password.length < 8) {
+        return errorResponse(
+          res,
+          400,
+          "Password must be at least 8 characters"
+        );
+      }
+
+      // Service verification
       const service = await validateService(serviceSecret);
       if (!service) {
         return errorResponse(res, 403, "Invalid service");
@@ -107,6 +126,7 @@ const AuthController = {
           password,
           PASSWORD_SALT_ROUNDS
         );
+        console.log("Hashed password:", hashedPassword); // Log hashed password
         user = new User({
           email,
           password: hashedPassword,
@@ -117,6 +137,7 @@ const AuthController = {
           lastPasswordChange: new Date(),
         });
         await user.save();
+        console.log("Saved user:", user); // Log saved user
       }
 
       // Check existing service registration
@@ -164,20 +185,34 @@ const AuthController = {
 
   async login(req, res) {
     try {
+      console.log("Request body:", req.body); // Log input
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
       const { email, password, serviceSecret } = sanitizeUserInput(req.body);
+      console.log("Sanitized input:", { email, password, serviceSecret });
 
-      // Find user with login attempt tracking
+      // Validate password presence
+      if (!password) {
+        return errorResponse(res, 400, "Password is required");
+      }
+
+      // Find user
       const user = await User.findOne({ email });
       if (!user) {
         return errorResponse(res, 401, "Invalid credentials");
       }
+      console.log("User from DB:", user);
 
-      // Check if account is locked
+      // Check user password
+      if (!user.password) {
+        console.error("User password is undefined for email:", email);
+        return errorResponse(res, 500, "User account is corrupted");
+      }
+
+      // Check account lock
       if (
         user.failedLoginAttempts >= RATE_LIMIT.LOGIN_ATTEMPTS &&
         new Date() < new Date(user.lockUntil)
@@ -205,7 +240,7 @@ const AuthController = {
         await user.save();
       }
 
-      // Verify service by code (no secret required)
+      // Verify service
       const service = await validateService(serviceSecret);
       if (!service) {
         return errorResponse(res, 403, "Invalid service code");
