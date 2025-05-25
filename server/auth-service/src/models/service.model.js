@@ -8,7 +8,7 @@ const ServiceSchema = new mongoose.Schema({
   code: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   secret: {
     type: String,

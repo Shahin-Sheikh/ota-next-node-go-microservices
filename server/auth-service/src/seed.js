@@ -4,8 +4,7 @@ const Service = require("./models/service.model");
 const User = require("./models/user.model");
 const UserService = require("./models/user-service.model");
 
-const MONGODB_URI =
-  "mongodb+srv://root:1234@cluster0.zqqkmng.mongodb.net/ota-auth-db";
+const MONGODB_URI = env.process.MONGODB_URI;
 
 async function seedData() {
   try {
@@ -18,20 +17,12 @@ async function seedData() {
 
     console.log("Connected to MongoDB Atlas successfully");
 
-    // Clear existing data
-    console.log("Clearing existing data...");
-    await Promise.all([
-      Service.deleteMany({}),
-      User.deleteMany({}),
-      UserService.deleteMany({}),
-    ]);
-
     // Create test service
     console.log("Creating test service...");
     const testService = new Service({
-      name: "Customer",
-      code: "ota_customer",
-      secret: "a8f#OcKn>M/5d4t1X)W^",
+      name: "Admin",
+      code: "ota_admin",
+      secret: ")X'^#</Nd2jS%AurN>-Q",
     });
     await testService.save();
 
@@ -52,7 +43,7 @@ async function seedData() {
     const userService = new UserService({
       user: testUser._id,
       service: testService._id,
-      serviceSecret: "a8f#OcKn>M/5d4t1X)W^",
+      serviceSecret: ")X'^#</Nd2jS%AurN>-Q",
     });
     await userService.save();
 
