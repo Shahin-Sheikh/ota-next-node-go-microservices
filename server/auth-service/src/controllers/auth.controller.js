@@ -1,259 +1,315 @@
 const User = require("../models/user.model");
 const Service = require("../models/service.model");
-const UserService = require("../models/user-service.model"); // New model for many-to-many relationship
+const UserService = require("../models/user-service.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+const crypto = require("crypto");
+const { validateService } = require("../utils/service-validator.util");
 
-// Token generation functions
-const generateAccessToken = (user, serviceCode) => {
-  return jwt.sign(
+// Security constants
+const PASSWORD_SALT_ROUNDS = 12;
+const TOKEN_EXPIRY = {
+  ACCESS: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
+  REFRESH: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
+};
+const RATE_LIMIT = {
+  LOGIN_ATTEMPTS: 5,
+  WINDOW_MINUTES: 15,
+};
+
+// Token generation with enhanced security
+const generateToken = (payload, secret, expiresIn) => {
+  const jwtid = crypto.randomBytes(16).toString("hex");
+  return jwt.sign(payload, secret, {
+    expiresIn,
+    jwtid,
+    algorithm: "HS256",
+  });
+};
+
+const generateAccessToken = (user, serviceSecret) => {
+  return generateToken(
     {
       id: user._id,
       email: user.email,
-      serviceCode,
+      serviceSecret,
+      role: user.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m" }
+    TOKEN_EXPIRY.ACCESS
   );
 };
 
-const generateRefreshToken = (user, serviceCode) => {
-  return jwt.sign(
+const generateRefreshToken = (user, serviceSecret) => {
+  return generateToken(
     {
       id: user._id,
       email: user.email,
-      serviceCode,
+      serviceSecret,
     },
     process.env.JWT_REFRESH_SECRET,
-    {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
-    }
+    TOKEN_EXPIRY.REFRESH
   );
 };
 
-// Register controller
-const register = async (req, res) => {
-  // Validate input
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const { email, password, phone, firstName, lastName, dob, serviceSecret } =
-      req.body;
-
-    // Check if service exists
-    const service = await Service.findOne({ secret: serviceSecret });
-    if (!service) {
-      return res.status(403).json({ message: "Invalid service secret" });
+const sanitizeUserInput = (input) => {
+  return Object.keys(input).reduce((acc, key) => {
+    if (typeof input[key] === "string") {
+      acc[key] = input[key].trim();
+    } else {
+      acc[key] = input[key];
     }
+    return acc;
+  }, {});
+};
 
-    // Check if user exists
-    let user = await User.findOne({ email });
-    const isNewUser = !user;
+const errorResponse = (res, status, message, error = null) => {
+  const response = { success: false, message };
+  if (error && process.env.NODE_ENV === "development") {
+    response.error = error.message;
+  }
+  return res.status(status).json(response);
+};
 
-    if (isNewUser) {
-      // Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+const AuthController = {
+  async register(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-      // Create new user
-      user = new User({
+      const sanitizedInput = sanitizeUserInput(req.body);
+      const {
         email,
-        password: hashedPassword,
+        password,
         phone,
         firstName,
         lastName,
         dob,
+        serviceSecret,
+      } = sanitizedInput;
+
+      // Service verification by code (no secret required)
+      const service = await validateService(serviceSecret);
+      if (!service) {
+        return errorResponse(res, 403, "Invalid service");
+      }
+
+      // Check existing user
+      const existingUser = await User.findOne({ email });
+      const isNewUser = !existingUser;
+      let user = existingUser;
+
+      if (isNewUser) {
+        const hashedPassword = await bcrypt.hash(
+          password,
+          PASSWORD_SALT_ROUNDS
+        );
+        user = new User({
+          email,
+          password: hashedPassword,
+          phone,
+          firstName,
+          lastName,
+          dob,
+          lastPasswordChange: new Date(),
+        });
+        await user.save();
+      }
+
+      // Check existing service registration
+      const existingUserService = await UserService.findOne({
+        user: user._id,
+        service: service._id,
       });
 
-      await user.save();
-    }
+      if (existingUserService) {
+        return errorResponse(
+          res,
+          409,
+          "User already registered with this service"
+        );
+      }
 
-    // Check if user is already registered with this service
-    const existingUserService = await UserService.findOne({
-      user: user._id,
-      service: service._id,
-    });
+      // Create service relationship
+      await new UserService({
+        user: user._id,
+        service: service._id,
+      }).save();
 
-    if (existingUserService) {
-      return res.status(409).json({
-        message: "User already exist",
-        isNewUser: false,
+      // Generate tokens
+      const accessToken = generateAccessToken(user, service.secret);
+      const refreshToken = generateRefreshToken(user, service.secret);
+
+      return res.status(201).json({
+        success: true,
+        accessToken,
+        refreshToken,
+        data: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          dob: user.dob,
+        },
       });
+    } catch (error) {
+      console.error("Registration error:", error);
+      return errorResponse(res, 500, "Registration failed", error);
     }
+  },
 
-    // Create user-service relationship
-    const userService = new UserService({
-      user: user._id,
-      service: service._id,
-      serviceSecret: serviceSecret, // Storing the secret used for registration
-    });
+  async login(req, res) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    await userService.save();
+      const { email, password, serviceSecret } = sanitizeUserInput(req.body);
 
-    // Generate tokens
-    const accessToken = generateAccessToken(user, service.code);
-    const refreshToken = generateRefreshToken(user, service.code);
+      // Find user with login attempt tracking
+      const user = await User.findOne({ email });
+      if (!user) {
+        return errorResponse(res, 401, "Invalid credentials");
+      }
 
-    res.status(201).json({
-      message: "User registered successfully",
-      accessToken,
-      refreshToken,
-      data: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        dob: user.dob,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Registration failed",
-      error: err.message,
-    });
-  }
-};
+      // Check if account is locked
+      if (
+        user.failedLoginAttempts >= RATE_LIMIT.LOGIN_ATTEMPTS &&
+        new Date() < new Date(user.lockUntil)
+      ) {
+        return errorResponse(res, 429, "Account temporarily locked");
+      }
 
-// Login controller
-const login = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+      // Verify password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        user.failedLoginAttempts += 1;
+        if (user.failedLoginAttempts >= RATE_LIMIT.LOGIN_ATTEMPTS) {
+          user.lockUntil = new Date(
+            Date.now() + RATE_LIMIT.WINDOW_MINUTES * 60 * 1000
+          );
+        }
+        await user.save();
+        return errorResponse(res, 401, "Invalid credentials");
+      }
 
-  const { email, password, serviceSecret } = req.body;
+      // Reset login attempts
+      if (user.failedLoginAttempts > 0 || user.lockUntil) {
+        user.failedLoginAttempts = 0;
+        user.lockUntil = null;
+        await user.save();
+      }
 
-  try {
-    // Find user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+      // Verify service by code (no secret required)
+      const service = await validateService(serviceSecret);
+      if (!service) {
+        return errorResponse(res, 403, "Invalid service code");
+      }
 
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // Verify service
-    const service = await Service.findOne({ secret: serviceSecret });
-    if (!service) {
-      return res.status(403).json({ message: "Invalid service secret" });
-    }
-
-    // Check if user is registered with this service
-    const userService = await UserService.findOne({
-      user: user._id,
-      service: service._id,
-    });
-
-    if (!userService) {
-      return res.status(403).json({
-        message: "User not registered",
+      // Check service registration
+      const userService = await UserService.findOne({
+        user: user._id,
+        service: service._id,
       });
-    }
+      if (!userService) {
+        return errorResponse(res, 403, "User not registered with this service");
+      }
 
-    // Generate tokens
-    const accessToken = generateAccessToken(user, service.code);
-    const refreshToken = generateRefreshToken(user, service.code);
+      // Generate tokens
+      const accessToken = generateAccessToken(user, service.secret);
+      const refreshToken = generateRefreshToken(user, service.secret);
 
-    res.status(200).json({
-      message: "Login successful",
-      accessToken,
-      refreshToken,
-      data: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        dob: user.dob,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Login failed",
-      error: err.message,
-    });
-  }
-};
-
-// Refresh token controller
-const refreshAccessToken = async (req, res) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) {
-    return res.status(401).json({ message: "Refresh token required" });
-  }
-
-  try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-    // Verify user exists
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Verify service exists
-    const service = await Service.findOne({ code: decoded.serviceCode });
-    if (!service) {
-      return res.status(404).json({ message: "Service not found" });
-    }
-
-    // Verify user is registered with this service
-    const userService = await UserService.findOne({
-      user: user._id,
-      service: service._id,
-    });
-    if (!userService) {
-      return res.status(403).json({
-        message: "User not registered",
+      return res.json({
+        success: true,
+        accessToken,
+        refreshToken,
+        data: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
       });
+    } catch (error) {
+      console.error("Login error:", error);
+      return errorResponse(res, 500, "Login failed", error);
     }
+  },
 
-    // Generate new access token
-    const accessToken = generateAccessToken(user, service.code);
+  async refreshAccessToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        return errorResponse(res, 401, "Refresh token required");
+      }
 
-    res.json({ accessToken });
-  } catch (err) {
-    res.status(403).json({
-      message: "Invalid refresh token",
-      error: err.message,
-    });
-  }
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+      // Verify user exists
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return errorResponse(res, 404, "User not found");
+      }
+
+      // Verify service exists
+      const service = await Service.findOne({ secret: decoded.serviceSecret });
+      if (!service) {
+        return errorResponse(res, 404, "Service not found");
+      }
+
+      // Verify service registration
+      const userService = await UserService.findOne({
+        user: user._id,
+        service: service._id,
+      });
+      if (!userService) {
+        return errorResponse(res, 403, "User not registered with this service");
+      }
+
+      // Generate new access token
+      const accessToken = generateAccessToken(user, service.secret);
+
+      return res.json({
+        success: true,
+        accessToken,
+      });
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      if (error.name === "TokenExpiredError") {
+        return errorResponse(res, 401, "Refresh token expired");
+      }
+      return errorResponse(res, 403, "Invalid refresh token", error);
+    }
+  },
+
+  async getMe(req, res) {
+    try {
+      const user = await User.findById(req.user.id).select("-password -__v");
+      if (!user) {
+        return errorResponse(res, 404, "User not found");
+      }
+
+      return res.json({
+        success: true,
+        data: {
+          id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          dob: user.dob,
+        },
+      });
+    } catch (error) {
+      console.error("Get user error:", error);
+      return errorResponse(res, 500, "Error fetching user data", error);
+    }
+  },
 };
 
-// Get current user info
-const getMe = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({
-      data: {
-        id: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        dob: user.dob,
-        serviceCode: req.user.serviceCode,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Error fetching user data",
-      error: err.message,
-    });
-  }
-};
-
-module.exports = { register, login, refreshAccessToken, getMe };
+module.exports = AuthController;

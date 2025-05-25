@@ -11,10 +11,6 @@ const UserServiceSchema = new mongoose.Schema({
     ref: "Service",
     required: true,
   },
-  serviceSecret: {
-    type: String,
-    required: true,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
