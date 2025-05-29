@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config/jwt.config");
 const CustomerUser = require("../models/customer-users.model");
-const ServiceUser = require("../models/service-user-factory");
+const ServiceUser = require("../models/service-user-factory.model");
 
 exports.protect = async (req, res, next) => {
   let token;
