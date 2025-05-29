@@ -1,11 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+const { validateServiceSecret } = require("../middlewares/service.middleware");
 
-router.post("/register", authController.register);
-router.post("/login", authController.login);
-router.post("/refresh-token", authController.refreshAccessToken);
-router.get("/me", authMiddleware, authController.getMe);
+// Customer routes
+router.post("/customer/register", authController.registerCustomer);
+router.post("/customer/login", authController.loginCustomer);
+
+// Service routes
+router.post(
+  "/service/register",
+  validateServiceSecret,
+  authController.registerServiceUser
+);
+router.post(
+  "/service/login",
+  validateServiceSecret,
+  authController.loginServiceUser
+);
+
+// Token routes
+router.post("/token/refresh", authController.refreshToken);
+router.post("/logout", authController.logout);
+
+// Service initialization
+router.post("/service/init", authController.initializeService);
 
 module.exports = router;

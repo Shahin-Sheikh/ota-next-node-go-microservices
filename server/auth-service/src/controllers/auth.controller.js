@@ -1,350 +1,368 @@
-const User = require("../models/user.model");
-const Service = require("../models/service.model");
-const UserService = require("../models/user-service.model");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
-const crypto = require("crypto");
-const { validateService } = require("../utils/service-validator.util");
+const {
+  jwtSecret,
+  jwtRefreshSecret,
+  accessTokenExpiresIn,
+  refreshTokenExpiresIn,
+} = require("../config/jwt.config");
+const CustomerUser = require("../models/customer-users.model");
+const createServiceUserModel = require("../models/service-user-factory");
+const ServiceRegistry = require("../models/service-registry.model");
+const bcrypt = require("bcryptjs");
 
-// Security constants
-const PASSWORD_SALT_ROUNDS = 12;
-const TOKEN_EXPIRY = {
-  ACCESS: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
-  REFRESH: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
-};
-const RATE_LIMIT = {
-  LOGIN_ATTEMPTS: 5,
-  WINDOW_MINUTES: 15,
-};
-
-// Token generation with enhanced security
-const generateToken = (payload, secret, expiresIn) => {
-  const jwtid = crypto.randomBytes(16).toString("hex");
-  return jwt.sign(payload, secret, {
-    expiresIn,
-    jwtid,
-    algorithm: "HS256",
+// Generate JWT token
+const generateTokens = (id, userType) => {
+  const accessToken = jwt.sign({ id, userType }, jwtSecret, {
+    expiresIn: accessTokenExpiresIn, // Make sure this is defined
   });
+
+  const refreshToken = jwt.sign({ id, userType }, jwtRefreshSecret, {
+    expiresIn: refreshTokenExpiresIn, // Make sure this is defined
+  });
+
+  return { accessToken, refreshToken };
 };
 
-const generateAccessToken = (user, serviceSecret) => {
-  return generateToken(
-    {
-      id: user._id,
-      email: user.email,
-      serviceSecret,
-      role: user.role,
-    },
-    process.env.JWT_SECRET,
-    TOKEN_EXPIRY.ACCESS
-  );
-};
+// Add refresh token to user
+const addRefreshToken = async (user, refreshToken, userType) => {
+  const expires = new Date();
+  expires.setDate(expires.getDate() + 7); // 7 days
 
-const generateRefreshToken = (user, serviceSecret) => {
-  return generateToken(
-    {
-      id: user._id,
-      email: user.email,
-      serviceSecret,
-    },
-    process.env.JWT_REFRESH_SECRET,
-    TOKEN_EXPIRY.REFRESH
-  );
-};
-
-const sanitizeUserInput = (input) => {
-  return Object.keys(input).reduce((acc, key) => {
-    if (typeof input[key] === "string") {
-      acc[key] = input[key].trim();
-    } else {
-      acc[key] = input[key];
-    }
-    return acc;
-  }, {});
-};
-
-const errorResponse = (res, status, message, error = null) => {
-  const response = { success: false, message };
-  if (error && process.env.NODE_ENV === "development") {
-    response.error = error.message;
+  if (userType === "customer") {
+    await CustomerUser.findByIdAndUpdate(user._id, {
+      $push: {
+        refreshTokens: {
+          token: refreshToken,
+          expires,
+        },
+      },
+    });
+  } else {
+    await ServiceUser.findByIdAndUpdate(user._id, {
+      $push: {
+        refreshTokens: {
+          token: refreshToken,
+          expires,
+        },
+      },
+    });
   }
-  return res.status(status).json(response);
 };
 
-const AuthController = {
-  async register(req, res) {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+// Customer registration
+exports.registerCustomer = async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
 
-      const sanitizedInput = sanitizeUserInput(req.body);
-      const {
-        email,
-        password,
-        phone,
-        firstName,
-        lastName,
-        dob,
-        serviceSecret,
-      } = sanitizedInput;
-
-      console.log("Register input:", {
-        email,
-        password,
-        phone,
-        firstName,
-        lastName,
-        dob,
-        serviceSecret,
-      }); // Log input
-
-      // Validate password presence and length
-      if (!password || password.length < 8) {
-        return errorResponse(
-          res,
-          400,
-          "Password must be at least 8 characters"
-        );
-      }
-
-      // Service verification
-      const service = await validateService(serviceSecret);
-      if (!service) {
-        return errorResponse(res, 403, "Invalid service");
-      }
-
-      // Check existing user
-      const existingUser = await User.findOne({ email });
-      const isNewUser = !existingUser;
-      let user = existingUser;
-
-      if (isNewUser) {
-        const hashedPassword = await bcrypt.hash(
-          password,
-          PASSWORD_SALT_ROUNDS
-        );
-        console.log("Hashed password:", hashedPassword); // Log hashed password
-        user = new User({
-          email,
-          password: hashedPassword,
-          phone,
-          firstName,
-          lastName,
-          dob,
-          lastPasswordChange: new Date(),
-        });
-        await user.save();
-        console.log("Saved user:", user); // Log saved user
-      }
-
-      // Check existing service registration
-      const existingUserService = await UserService.findOne({
-        user: user._id,
-        service: service._id,
+    const existingUser = await CustomerUser.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already in use",
       });
-
-      if (existingUserService) {
-        return errorResponse(
-          res,
-          409,
-          "User already registered with this service"
-        );
-      }
-
-      // Create service relationship
-      await new UserService({
-        user: user._id,
-        service: service._id,
-      }).save();
-
-      // Generate tokens
-      const accessToken = generateAccessToken(user, service.secret);
-      const refreshToken = generateRefreshToken(user, service.secret);
-
-      return res.status(201).json({
-        success: true,
-        accessToken,
-        refreshToken,
-        data: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          dob: user.dob,
-        },
-      });
-    } catch (error) {
-      console.error("Registration error:", error);
-      return errorResponse(res, 500, "Registration failed", error);
     }
-  },
 
-  async login(req, res) {
-    try {
-      console.log("Request body:", req.body); // Log input
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+    const user = await CustomerUser.create({ email, password, name });
+    const { accessToken, refreshToken } = generateTokens(user._id, "customer");
 
-      const { email, password, serviceSecret } = sanitizeUserInput(req.body);
-      console.log("Sanitized input:", { email, password, serviceSecret });
+    await addRefreshToken(user, refreshToken, "customer");
 
-      // Validate password presence
-      if (!password) {
-        return errorResponse(res, 400, "Password is required");
-      }
-
-      // Find user
-      const user = await User.findOne({ email });
-      if (!user) {
-        return errorResponse(res, 401, "Invalid credentials");
-      }
-      console.log("User from DB:", user);
-
-      // Check user password
-      if (!user.password) {
-        console.error("User password is undefined for email:", email);
-        return errorResponse(res, 500, "User account is corrupted");
-      }
-
-      // Check account lock
-      if (
-        user.failedLoginAttempts >= RATE_LIMIT.LOGIN_ATTEMPTS &&
-        new Date() < new Date(user.lockUntil)
-      ) {
-        return errorResponse(res, 429, "Account temporarily locked");
-      }
-
-      // Verify password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        user.failedLoginAttempts += 1;
-        if (user.failedLoginAttempts >= RATE_LIMIT.LOGIN_ATTEMPTS) {
-          user.lockUntil = new Date(
-            Date.now() + RATE_LIMIT.WINDOW_MINUTES * 60 * 1000
-          );
-        }
-        await user.save();
-        return errorResponse(res, 401, "Invalid credentials");
-      }
-
-      // Reset login attempts
-      if (user.failedLoginAttempts > 0 || user.lockUntil) {
-        user.failedLoginAttempts = 0;
-        user.lockUntil = null;
-        await user.save();
-      }
-
-      // Verify service
-      const service = await validateService(serviceSecret);
-      if (!service) {
-        return errorResponse(res, 403, "Invalid service code");
-      }
-
-      // Check service registration
-      const userService = await UserService.findOne({
-        user: user._id,
-        service: service._id,
-      });
-      if (!userService) {
-        return errorResponse(res, 403, "User not registered with this service");
-      }
-
-      // Generate tokens
-      const accessToken = generateAccessToken(user, service.secret);
-      const refreshToken = generateRefreshToken(user, service.secret);
-
-      return res.json({
-        success: true,
-        accessToken,
-        refreshToken,
-        data: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      return errorResponse(res, 500, "Login failed", error);
-    }
-  },
-
-  async refreshAccessToken(req, res) {
-    try {
-      const { refreshToken } = req.body;
-      if (!refreshToken) {
-        return errorResponse(res, 401, "Refresh token required");
-      }
-
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
-      // Verify user exists
-      const user = await User.findById(decoded.id);
-      if (!user) {
-        return errorResponse(res, 404, "User not found");
-      }
-
-      // Verify service exists
-      const service = await Service.findOne({ secret: decoded.serviceSecret });
-      if (!service) {
-        return errorResponse(res, 404, "Service not found");
-      }
-
-      // Verify service registration
-      const userService = await UserService.findOne({
-        user: user._id,
-        service: service._id,
-      });
-      if (!userService) {
-        return errorResponse(res, 403, "User not registered with this service");
-      }
-
-      // Generate new access token
-      const accessToken = generateAccessToken(user, service.secret);
-
-      return res.json({
-        success: true,
-        accessToken,
-      });
-    } catch (error) {
-      console.error("Token refresh error:", error);
-      if (error.name === "TokenExpiredError") {
-        return errorResponse(res, 401, "Refresh token expired");
-      }
-      return errorResponse(res, 403, "Invalid refresh token", error);
-    }
-  },
-
-  async getMe(req, res) {
-    try {
-      const user = await User.findById(req.user.id).select("-password -__v");
-      if (!user) {
-        return errorResponse(res, 404, "User not found");
-      }
-
-      return res.json({
-        success: true,
-        data: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          dob: user.dob,
-        },
-      });
-    } catch (error) {
-      console.error("Get user error:", error);
-      return errorResponse(res, 500, "Error fetching user data", error);
-    }
-  },
+    res.status(201).json({
+      success: true,
+      accessToken,
+      refreshToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
 };
 
-module.exports = AuthController;
+// Customer login
+exports.loginCustomer = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await CustomerUser.findOne({ email }).select("+password");
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const { accessToken, refreshToken } = generateTokens(user._id, "customer");
+    await addRefreshToken(user, refreshToken, "customer");
+
+    res.status(200).json({
+      success: true,
+      accessToken,
+      refreshToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+exports.refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token is required",
+      });
+    }
+
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, jwtRefreshSecret);
+
+    let user;
+    if (decoded.userType === "customer") {
+      user = await CustomerUser.findOne({
+        _id: decoded.id,
+        "refreshTokens.token": refreshToken,
+        "refreshTokens.expires": { $gt: new Date() },
+      });
+    } else {
+      user = await ServiceUser.findOne({
+        _id: decoded.id,
+        "refreshTokens.token": refreshToken,
+        "refreshTokens.expires": { $gt: new Date() },
+      });
+    }
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid refresh token",
+      });
+    }
+
+    // Generate new tokens
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+      user._id,
+      decoded.userType
+    );
+
+    // Remove old refresh token and add new one
+    if (decoded.userType === "customer") {
+      await CustomerUser.findByIdAndUpdate(user._id, {
+        $pull: { refreshTokens: { token: refreshToken } },
+      });
+      await addRefreshToken(user, newRefreshToken, "customer");
+    } else {
+      await ServiceUser.findByIdAndUpdate(user._id, {
+        $pull: { refreshTokens: { token: refreshToken } },
+      });
+      await addRefreshToken(user, newRefreshToken, "service");
+    }
+
+    res.status(200).json({
+      success: true,
+      accessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token expired",
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// Service user registration (protected by service secret)
+exports.registerServiceUser = async (req, res) => {
+  try {
+    const { username, password, roles } = req.body;
+    const service = req.service;
+    const ServiceUser = createServiceUserModel(service);
+    const existingUser = await ServiceUser.findOne({ username, service });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Username already in use for this service",
+      });
+    }
+
+    const user = await ServiceUser.create({
+      username,
+      password,
+      service,
+      roles: roles || ["user"],
+    });
+
+    const token = generateToken(user._id, "service");
+
+    res.status(201).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        service: user.service,
+        roles: user.roles,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// Service user login (protected by service secret)
+exports.loginServiceUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const service = req.service;
+    const ServiceUser = createServiceUserModel(service);
+    const user = await ServiceUser.findOne({ username, service }).select(
+      "+password"
+    );
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = generateToken(user._id, "service");
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        service: user.service,
+        roles: user.roles,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// Logout endpoint
+exports.logout = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token is required",
+      });
+    }
+
+    // Verify refresh token to get user type
+    const decoded = jwt.verify(refreshToken, jwtRefreshSecret);
+
+    if (decoded.userType === "customer") {
+      await CustomerUser.updateOne(
+        { _id: decoded.id },
+        { $pull: { refreshTokens: { token: refreshToken } } }
+      );
+    } else {
+      await ServiceUser.updateOne(
+        { _id: decoded.id },
+        { $pull: { refreshTokens: { token: refreshToken } } }
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
+
+// Initialize service (one-time setup)
+exports.initializeService = async (req, res) => {
+  try {
+    const { serviceName, serviceSecret, allowedDomains } = req.body;
+
+    if (
+      !["admin", "accounting", "inventory", "shipping"].includes(serviceName)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid service name",
+      });
+    }
+
+    const existingService = await ServiceRegistry.findOne({ serviceName });
+    if (existingService) {
+      return res.status(400).json({
+        success: false,
+        message: "Service already initialized",
+      });
+    }
+
+    const hashedSecret = await bcrypt.hash(serviceSecret, 12);
+
+    const service = await ServiceRegistry.create({
+      serviceName,
+      serviceSecret: hashedSecret,
+      allowedDomains: allowedDomains || [],
+    });
+
+    // Create the collection by initializing the model
+    createServiceUserModel(serviceName);
+
+    res.status(201).json({
+      success: true,
+      service: {
+        id: service._id,
+        serviceName: service.serviceName,
+        allowedDomains: service.allowedDomains,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message,
+    });
+  }
+};
