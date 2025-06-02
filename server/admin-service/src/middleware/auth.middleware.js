@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 function authenticateToken(req, res, next) {
-  // 1. More robust header checking
+  // 1. Get Authorization header safely
   const authHeader =
     req.headers["authorization"] || req.headers["Authorization"];
   if (!authHeader?.startsWith("Bearer ")) {
@@ -12,8 +12,10 @@ function authenticateToken(req, res, next) {
     });
   }
 
-  // 2. Extract token
-  const token = authHeader.split(" ")[1];
+  console.log("Authorization Header:", authHeader);
+
+  // 2. Extract token safely
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -21,10 +23,11 @@ function authenticateToken(req, res, next) {
     });
   }
 
+  console.log("Extracted Token:", token);
+
   // 3. Verify token
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      // 4. More specific error messages
       let errorMessage = "Invalid token";
       if (err.name === "TokenExpiredError") {
         errorMessage = "Token expired";
@@ -38,19 +41,18 @@ function authenticateToken(req, res, next) {
       });
     }
 
-    // 5. Additional payload validation
-    if (!decoded.userId || !decoded.role) {
+    // 4. Match actual token payload
+    if (!decoded.id || !decoded.userType) {
       return res.status(403).json({
         success: false,
         error: "Token payload invalid",
       });
     }
 
-    // 6. Attach user to request
+    // 5. Attach user to request
     req.user = {
-      id: decoded.userId,
-      role: decoded.role,
-      // add other necessary fields from the token
+      id: decoded.id,
+      role: decoded.userType,
       ...decoded,
     };
 
