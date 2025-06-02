@@ -23,7 +23,7 @@ exports.registerCustomer = async (req, res) => {
       success: true,
       accessToken,
       refreshToken,
-      user: {
+      data: {
         id: user._id,
         email: user.email,
         name: user.name,
@@ -59,7 +59,7 @@ exports.loginCustomer = async (req, res) => {
       success: true,
       accessToken,
       refreshToken,
-      user: {
+      data: {
         id: user._id,
         email: user.email,
         name: user.name,

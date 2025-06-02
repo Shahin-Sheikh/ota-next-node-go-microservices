@@ -37,7 +37,7 @@ exports.initializeService = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      service: {
+      data: {
         id: service._id,
         serviceName: service.serviceName,
         allowedDomains: service.allowedDomains,
