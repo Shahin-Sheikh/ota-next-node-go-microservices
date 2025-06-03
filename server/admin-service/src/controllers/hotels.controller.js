@@ -1,11 +1,13 @@
+const db = require("../models");
+const Hotel = db.Hotel;
+const Room = db.Room;
+const { Op } = require("sequelize");
+
 // Admin CRUD Operations
-
-const Hotel = require("../models/hotels.model");
-const RoomType = require("../models/room-type.model");
-
 const createHotel = async (req, res) => {
   try {
     const hotelData = req.body;
+    hotelData.createdBy = req.user.id;
     const hotel = await Hotel.create(hotelData);
     res.status(201).json(hotel);
   } catch (error) {
@@ -15,12 +17,30 @@ const createHotel = async (req, res) => {
 
 const getAllHotels = async (req, res) => {
   try {
+    const { status, searchKey } = req.query;
+    const whereClause = {};
+
+    if (status) whereClause.status = status;
+
+    if (searchKey) {
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${searchKey}%` } },
+        { description: { [Op.iLike]: `%${searchKey}%` } },
+        { "$location.city$": { [Op.iLike]: `%${searchKey}%` } },
+        { "$location.country$": { [Op.iLike]: `%${searchKey}%` } },
+        { "$address.street$": { [Op.iLike]: `%${searchKey}%` } },
+      ];
+    }
+
     const hotels = await Hotel.findAll({
-      where: { isActive: true },
-      include: [{ model: RoomType }],
+      where: whereClause,
+      include: [{ model: Room, as: "rooms" }],
+      order: [["createdAt", "DESC"]],
     });
+
     res.json(hotels);
   } catch (error) {
+    console.log("full error", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -28,11 +48,9 @@ const getAllHotels = async (req, res) => {
 const getHotelById = async (req, res) => {
   try {
     const hotel = await Hotel.findByPk(req.params.id, {
-      include: [{ model: RoomType }],
+      include: [{ model: Room, as: "rooms" }],
     });
-    if (!hotel) {
-      return res.status(404).json({ error: "Hotel not found" });
-    }
+    if (!hotel) return res.status(404).json({ error: "Hotel not found" });
     res.json(hotel);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -42,7 +60,7 @@ const getHotelById = async (req, res) => {
 const updateHotel = async (req, res) => {
   try {
     const [updated] = await Hotel.update(req.body, {
-      where: { id: req.params.id },
+      where: { _id: req.params.id },
     });
     if (updated) {
       const updatedHotel = await Hotel.findByPk(req.params.id);
@@ -54,103 +72,89 @@ const updateHotel = async (req, res) => {
   }
 };
 
-const deleteHotel = async (req, res) => {
+const activateHotel = async (req, res) => {
   try {
-    const deleted = await Hotel.update(
-      { isActive: false },
-      { where: { id: req.params.id } }
+    const [updated] = await Hotel.update(
+      { status: "active" },
+      { where: { _id: req.params.id } }
     );
-    if (deleted) {
-      return res.json({ message: "Hotel deactivated" });
-    }
+    if (updated) return res.json({ message: "Hotel activated" });
     throw new Error("Hotel not found");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-// Room Type Operations
-
-const addRoomType = async (req, res) => {
+const deactivateHotel = async (req, res) => {
   try {
-    const hotel = await Hotel.findByPk(req.params.hotelId);
-    if (!hotel) {
-      return res.status(404).json({ error: "Hotel not found" });
-    }
-
-    const roomTypeData = { ...req.body, HotelId: hotel.id };
-    const roomType = await RoomType.create(roomTypeData);
-    res.status(201).json(roomType);
+    const [updated] = await Hotel.update(
+      { status: "inactive" },
+      { where: { _id: req.params.id } }
+    );
+    if (updated) return res.json({ message: "Hotel deactivated" });
+    throw new Error("Hotel not found");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-const updateRoomType = async (req, res) => {
+// Room Operations
+const addRoom = async (req, res) => {
   try {
-    const [updated] = await RoomType.update(req.body, {
-      where: { id: req.params.roomTypeId },
+    const hotel = await Hotel.findByPk(req.params.hotelId);
+    if (!hotel) return res.status(404).json({ error: "Hotel not found" });
+
+    const room = await Room.create({
+      ...req.body,
+      hotelId: hotel._id,
+    });
+
+    res.status(201).json(room);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const updateRoom = async (req, res) => {
+  try {
+    const [updated] = await Room.update(req.body, {
+      where: { _id: req.params.roomId },
     });
     if (updated) {
-      const updatedRoomType = await RoomType.findByPk(req.params.roomTypeId);
-      return res.json(updatedRoomType);
+      const updatedRoom = await Room.findByPk(req.params.roomId);
+      return res.json(updatedRoom);
     }
-    throw new Error("Room type not found");
+    throw new Error("Room not found");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 // Search Functionality
-
 const searchHotels = async (req, res) => {
   try {
-    const { city, checkIn, checkOut, guests, page = 1, limit = 10 } = req.query;
+    const { searchKey, page = 1, limit = 10 } = req.query;
+    const whereClause = {};
 
-    // Basic search by city
-    const whereClause = {
-      city: { [Op.iLike]: `%${city}%` },
-      isActive: true,
-    };
+    if (searchKey) {
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${searchKey}%` } },
+        { description: { [Op.iLike]: `%${searchKey}%` } },
+        { "$location.city$": { [Op.iLike]: `%${searchKey}%` } },
+        { "$location.country$": { [Op.iLike]: `%${searchKey}%` } },
+        { "$address.street$": { [Op.iLike]: `%${searchKey}%` } },
+      ];
+    }
 
-    // Find available hotels with room types that can accommodate the guests
     const hotels = await Hotel.findAll({
       where: whereClause,
-      include: [
-        {
-          model: RoomType,
-          where: {
-            maxOccupancy: { [Op.gte]: guests },
-            quantityAvailable: { [Op.gt]: 0 },
-          },
-        },
-      ],
+      include: [{ model: Room, as: "rooms" }],
       limit: parseInt(limit),
       offset: (page - 1) * limit,
+      order: [["createdAt", "DESC"]],
     });
 
-    // Add availability check based on dates (would require a Reservation model)
-    // This is a simplified version - in production you'd need to check against actual bookings
-
-    const response = hotels.map((hotel) => ({
-      id: hotel.id,
-      name: hotel.name,
-      address: hotel.address,
-      city: hotel.city,
-      starRating: hotel.starRating,
-      amenities: hotel.amenities,
-      images: hotel.images,
-      roomsAvailable: hotel.RoomTypes.map((room) => ({
-        id: room.id,
-        name: room.name,
-        maxOccupancy: room.maxOccupancy,
-        pricePerNight: room.pricePerNight,
-        amenities: room.amenities,
-        images: room.images,
-      })),
-    }));
-
-    res.json(response);
+    res.json(hotels);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -161,8 +165,9 @@ module.exports = {
   getAllHotels,
   getHotelById,
   updateHotel,
-  deleteHotel,
-  addRoomType,
-  updateRoomType,
+  activateHotel,
+  deactivateHotel,
+  addRoom,
+  updateRoom,
   searchHotels,
 };

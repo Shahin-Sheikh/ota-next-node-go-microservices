@@ -1,10 +1,10 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
-const Hotel = sequelize.define(
+const Hotels = sequelize.define(
   "Hotel",
   {
-    id: {
+    _id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
@@ -15,72 +15,66 @@ const Hotel = sequelize.define(
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    country: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    postalCode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    latitude: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-    },
-    longitude: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
     },
     starRating: {
       type: DataTypes.FLOAT,
-      allowNull: false,
       validate: {
         min: 1,
         max: 5,
       },
+    },
+    location: {
+      type: DataTypes.JSONB,
+      defaultValue: {},
+    },
+    address: {
+      type: DataTypes.JSONB,
+      defaultValue: {},
     },
     amenities: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],
     },
     images: {
-      type: DataTypes.ARRAY(DataTypes.STRING), // URLs to images
+      type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: [],
     },
     policies: {
       type: DataTypes.JSONB,
       defaultValue: {},
     },
-    contactEmail: {
+    contact: {
+      type: DataTypes.JSONB,
+      defaultValue: {},
+    },
+    status: {
       type: DataTypes.STRING,
-      allowNull: false,
+      defaultValue: "active",
       validate: {
-        isEmail: true,
+        isIn: [["active", "inactive"]],
       },
     },
-    contactPhone: {
+    createdBy: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
     },
   },
   {
     timestamps: true,
-    tableName: "hotels",
+    tableName: "Hotels",
+    // If you're using PostgreSQL, you can add this for JSON fields:
+    // dialectOptions: {
+    //   useUTC: false,
+    // },
   }
 );
 
-module.exports = Hotel;
+// Define associations
+Hotels.associate = function (models) {
+  Hotels.hasMany(models.Room, {
+    foreignKey: "hotelId",
+    as: "rooms",
+    onDelete: "CASCADE", // Delete all rooms when hotel is deleted
+  });
+};
+
+module.exports = Hotels;

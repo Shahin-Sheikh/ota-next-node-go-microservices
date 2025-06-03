@@ -12,8 +12,6 @@ function authenticateToken(req, res, next) {
     });
   }
 
-  console.log("Authorization Header:", authHeader);
-
   // 2. Extract token safely
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
   if (!token) {
