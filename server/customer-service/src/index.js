@@ -9,11 +9,11 @@ app.use(express.json());
 const db = require("./models"); // This automatically loads and associates models
 
 // Load routes
-const hotelsRoutes = require("./routes/hotels.routes");
-app.use("/api/hotels", hotelsRoutes);
+const customerRoutes = require("./routes/customer.route");
+app.use("/api", customerRoutes);
 
 // Server
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.PORT;
 
 db.sequelize
   .sync({ alter: true })

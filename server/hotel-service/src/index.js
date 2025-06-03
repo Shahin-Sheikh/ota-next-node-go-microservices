@@ -13,7 +13,7 @@ const hotelsRoutes = require("./routes/hotels.routes");
 app.use("/api/hotels", hotelsRoutes);
 
 // Server
-const PORT = process.env.PORT || 3010;
+const PORT = process.env.PORT;
 
 db.sequelize
   .sync({ alter: true })
