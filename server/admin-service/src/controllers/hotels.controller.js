@@ -9,7 +9,9 @@ const createHotel = async (req, res) => {
     const hotelData = req.body;
     hotelData.createdBy = req.user.id;
     const hotel = await Hotel.create(hotelData);
-    res.status(201).json(hotel);
+    res.status(201).json({
+      data: hotel,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -38,7 +40,9 @@ const getAllHotels = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json(hotels);
+    res.json({
+      data: hotels,
+    });
   } catch (error) {
     console.log("full error", error);
     res.status(500).json({ error: error.message });
@@ -51,7 +55,9 @@ const getHotelById = async (req, res) => {
       include: [{ model: Room, as: "rooms" }],
     });
     if (!hotel) return res.status(404).json({ error: "Hotel not found" });
-    res.json(hotel);
+    res.json({
+      data: hotel,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -64,7 +70,9 @@ const updateHotel = async (req, res) => {
     });
     if (updated) {
       const updatedHotel = await Hotel.findByPk(req.params.id);
-      return res.json(updatedHotel);
+      return res.json({
+        data: updatedHotel,
+      });
     }
     throw new Error("Hotel not found");
   } catch (error) {
@@ -109,7 +117,9 @@ const addRoom = async (req, res) => {
       hotelId: hotel._id,
     });
 
-    res.status(201).json(room);
+    res.status(201).json({
+      data: room,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -122,7 +132,7 @@ const updateRoom = async (req, res) => {
     });
     if (updated) {
       const updatedRoom = await Room.findByPk(req.params.roomId);
-      return res.json(updatedRoom);
+      return res.json({ data: updatedRoom });
     }
     throw new Error("Room not found");
   } catch (error) {
@@ -154,7 +164,9 @@ const searchHotels = async (req, res) => {
       order: [["createdAt", "DESC"]],
     });
 
-    res.json(hotels);
+    res.json({
+      data: hotels,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
