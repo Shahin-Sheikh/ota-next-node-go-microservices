@@ -5,9 +5,6 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Load all models and setup associations
-const db = require("./models"); // This automatically loads and associates models
-
 // Load routes
 const customerRoutes = require("./routes/customer.route");
 app.use("/api", customerRoutes);
@@ -15,14 +12,19 @@ app.use("/api", customerRoutes);
 // Server
 const PORT = process.env.PORT;
 
-db.sequelize
-  .sync({ alter: true })
-  .then(() => {
-    console.log("Database synced");
-    app.listen(PORT, () => {
-      console.log(`Product Service running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Database connection failed:", err.message);
+app.get("/", (req, res) => {
+  res.send("Authentication Service Running");
+});
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
   });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
