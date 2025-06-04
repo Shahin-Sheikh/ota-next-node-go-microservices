@@ -13,4 +13,7 @@ const sequelize = new Sequelize(
   }
 );
 
-module.exports = sequelize;
+module.exports = {
+  sequelize,
+  HOTEL_SERVICE_URL: process.env.HOTEL_SERVICE_URL,
+};

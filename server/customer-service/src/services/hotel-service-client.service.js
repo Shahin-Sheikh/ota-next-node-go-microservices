@@ -3,12 +3,9 @@ const { HOTEL_SERVICE_URL } = require("../config/db.config");
 
 class HotelServiceClient {
   async searchHotels(params) {
-    const response = await axios.get(
-      `${HOTEL_SERVICE_URL}/api/hotels/search/all`,
-      {
-        params,
-      }
-    );
+    const response = await axios.get(`${HOTEL_SERVICE_URL}/api/hotels`, {
+      params,
+    });
     return response.data;
   }
 
