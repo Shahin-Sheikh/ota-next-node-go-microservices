@@ -1,0 +1,8 @@
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.csproj.AssemblyReference.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.GeneratedMSBuildEditorConfig.editorconfig
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.AssemblyInfoInputs.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.AssemblyInfo.cs
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.csproj.CoreCompileInputs.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.MvcApplicationPartsAssemblyInfo.cs
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.MvcApplicationPartsAssemblyInfo.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/Debug/net9.0/AdminService.API.sourcelink.json

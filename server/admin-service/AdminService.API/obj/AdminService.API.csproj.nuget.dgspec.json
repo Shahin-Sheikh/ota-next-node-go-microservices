@@ -1,0 +1,306 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/AdminService.API.csproj": {}
+  },
+  "projects": {
+    "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/AdminService.API.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/AdminService.API.csproj",
+        "projectName": "AdminService.API",
+        "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/AdminService.API.csproj",
+        "packagesPath": "/home/md-shahin-sheikh/.nuget/packages/",
+        "outputPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.API/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/md-shahin-sheikh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/AdminService.Application.csproj": {
+                "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/AdminService.Application.csproj"
+              },
+              "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/AdminService.Infrastructure.csproj": {
+                "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/AdminService.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.5.0, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/AdminService.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/AdminService.Application.csproj",
+        "projectName": "AdminService.Application",
+        "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/AdminService.Application.csproj",
+        "packagesPath": "/home/md-shahin-sheikh/.nuget/packages/",
+        "outputPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/md-shahin-sheikh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj": {
+                "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.5.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj",
+        "projectName": "AdminService.Domain",
+        "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj",
+        "packagesPath": "/home/md-shahin-sheikh/.nuget/packages/",
+        "outputPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/md-shahin-sheikh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/AdminService.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/AdminService.Infrastructure.csproj",
+        "projectName": "AdminService.Infrastructure",
+        "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/AdminService.Infrastructure.csproj",
+        "packagesPath": "/home/md-shahin-sheikh/.nuget/packages/",
+        "outputPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/md-shahin-sheikh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj": {
+                "projectPath": "/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Domain/AdminService.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

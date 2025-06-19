@@ -1,0 +1,16 @@
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/bin/Debug/net9.0/AdminService.Infrastructure.deps.json
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/bin/Debug/net9.0/AdminService.Infrastructure.dll
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/bin/Debug/net9.0/AdminService.Infrastructure.pdb
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/bin/Debug/net9.0/AdminService.Domain.dll
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/bin/Debug/net9.0/AdminService.Domain.pdb
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.csproj.AssemblyReference.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.AssemblyInfoInputs.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.AssemblyInfo.cs
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.csproj.CoreCompileInputs.cache
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.sourcelink.json
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminSer.BD147A19.Up2Date
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.dll
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/refint/AdminService.Infrastructure.dll
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/AdminService.Infrastructure.pdb
+/home/md-shahin-sheikh/PT/ota-next-node-go-microservices/server/admin-service/AdminService.Infrastructure/obj/Debug/net9.0/ref/AdminService.Infrastructure.dll

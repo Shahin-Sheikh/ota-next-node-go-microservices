@@ -1,0 +1,41 @@
+Microservice Admin Service with .NET and PostgreSQL
+Here's a basic structure for an admin microservice using .NET and PostgreSQL with clean architecture principles.
+
+Project Structure
+text
+AdminService/
+├── src/
+│   ├── AdminService.API/                # Web API Project (Presentation Layer)
+│   ├── AdminService.Application/        # Application Layer (MediatR, DTOs, Services)
+│   ├── AdminService.Domain/             # Domain Layer (Entities, Interfaces)
+│   ├── AdminService.Infrastructure/     # Infrastructure Layer (Persistence, Repositories)
+│   └── AdminService.sln                 # Solution file
+├── tests/
+│   ├── AdminService.UnitTests/          # Unit Tests
+│   └── AdminService.IntegrationTests/   # Integration Tests
+└── docker-compose.yml                   # Docker compose for Postgres
+Implementation Steps
+1. Create Solution and Projects
+bash
+dotnet new sln -n AdminService
+dotnet new webapi -n AdminService.API
+dotnet new classlib -n AdminService.Application
+dotnet new classlib -n AdminService.Domain
+dotnet new classlib -n AdminService.Infrastructure
+dotnet new xunit -n AdminService.UnitTests
+dotnet new xunit -n AdminService.IntegrationTests
+
+dotnet sln add src/AdminService.API/AdminService.API.csproj
+dotnet sln add src/AdminService.Application/AdminService.Application.csproj
+dotnet sln add src/AdminService.Domain/AdminService.Domain.csproj
+dotnet sln add src/AdminService.Infrastructure/AdminService.Infrastructure.csproj
+dotnet sln add tests/AdminService.UnitTests/AdminService.UnitTests.csproj
+dotnet sln add tests/AdminService.IntegrationTests/AdminService.IntegrationTests.csproj
+2. Set Up Dependencies
+API depends on Application
+
+Application depends on Domain and Infrastructure
+
+Infrastructure depends on Domain
+
+Tests depend on respective projects
