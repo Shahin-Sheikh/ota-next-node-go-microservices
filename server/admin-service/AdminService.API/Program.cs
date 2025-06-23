@@ -1,4 +1,6 @@
 using AdminService.Infrastructure;
+using AdminService.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
