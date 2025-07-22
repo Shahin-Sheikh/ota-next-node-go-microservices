@@ -1,0 +1,21 @@
+bin/
+obj/
+logs/
+.env
+.env.local
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+.vs/
+.vscode/
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Entity Framework
+Migrations/
