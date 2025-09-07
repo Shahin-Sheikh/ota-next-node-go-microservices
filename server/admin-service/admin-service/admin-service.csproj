@@ -11,4 +11,11 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Application\" />
+      <Folder Include="Domain\" />
+      <Folder Include="Infrastructure\" />
+      <Folder Include="Presentation\" />
+    </ItemGroup>
+
 </Project>

@@ -33,6 +33,16 @@ app.MapGet("/weatherforecast", () =>
     })
     .WithName("GetWeatherForecast");
 
+app.MapPost("/send-to-rasa", async (string message) =>
+{
+    using var client = new HttpClient();
+    var payload = new { sender = "user123", message = message };
+    var response = await client.PostAsJsonAsync("http://localhost:5005/webhooks/rest/webhook", payload);
+
+    var botResponse = await response.Content.ReadFromJsonAsync<List<RasaResponse>>();
+    return botResponse;
+});
+
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
