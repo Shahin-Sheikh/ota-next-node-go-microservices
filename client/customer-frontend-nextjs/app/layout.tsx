@@ -22,9 +22,7 @@ export const metadata: Metadata = {
   description: "Find and book amazing places to stay around the world",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+export default function RootLayout({}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -34,7 +32,6 @@ export default function RootLayout({
       >
         <div className="app-layout">
           <Navbar />
-          <main className="main-content">{children}</main>
         </div>
       </body>
     </html>
