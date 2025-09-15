@@ -1,10 +1,13 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const connectDB = require("./config/db.config");
+
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 // Initialize Express app
 const app = express();
@@ -20,7 +23,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", require("./routes/auth.routes"));
+const authRoutes = require("./routes/auth.routes");
+app.use("/api/auth", authRoutes);
 
 // Test route
 app.get("/", (req, res) => {
@@ -37,7 +41,6 @@ app.use((err, req, res, next) => {
 });
 
 // Server
-const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

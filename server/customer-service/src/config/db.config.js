@@ -1,5 +1,4 @@
 const { Sequelize } = require("sequelize");
-require("dotenv").config();
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -13,7 +12,14 @@ const sequelize = new Sequelize(
   }
 );
 
-module.exports = {
-  sequelize,
-  HOTEL_SERVICE_URL: process.env.HOTEL_SERVICE_URL,
+const connectDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Database connected successfully");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+  }
 };
+
+module.exports = connectDB;
+module.exports.sequelize = sequelize;
