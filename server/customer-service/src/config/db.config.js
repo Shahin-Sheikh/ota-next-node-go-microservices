@@ -1,14 +1,20 @@
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  process.env.DB_NAME || "master",
+  process.env.DB_USER || "SA",
+  process.env.DB_PASSWORD || "Shahin@885",
   {
-    host: process.env.DB_HOST,
-    dialect: "postgres",
-    port: process.env.DB_PORT,
+    host: process.env.DB_HOST || "localhost",
+    dialect: "mssql",
+    port: process.env.DB_PORT || 1433,
     logging: false,
+    dialectOptions: {
+      options: {
+        encrypt: false, // Use this if you're on Windows Azure
+        trustServerCertificate: true, // Use this if you have self-signed certificate
+      },
+    },
   }
 );
 

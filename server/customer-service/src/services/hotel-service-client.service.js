@@ -6,6 +6,7 @@ class HotelServiceClient {
     const response = await axios.get(`${HOTEL_SERVICE_URL}/api/hotels`, {
       params,
     });
+    console.log("response from hotel service:", response);
     return response.data;
   }
 
