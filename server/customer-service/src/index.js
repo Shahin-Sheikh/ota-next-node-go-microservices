@@ -21,7 +21,7 @@ const customerRoutes = require("./routes/customer.route");
 app.use("/api/customers", customerRoutes);
 
 // Test route
-app.get("/", (req, res) => {
+app.get("/hello", (req, res) => {
   res.send("Customer Service Running");
 });
 
