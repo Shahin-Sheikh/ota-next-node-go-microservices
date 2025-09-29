@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
 
 const navItems = [
   {
@@ -14,10 +13,9 @@ const navItems = [
 ];
 
 export default function Navbar() {
-  const [navbarHeight, setNavbarHeight] = useState<number>(100);
   return (
     <nav
-      className={`flex flex-row h-[${navbarHeight}px] w-full items-center border-b border-gray-200 justify-between shadow-sm background-white px-6`}
+      className={`flex flex-row w-full items-center border-b border-gray-200 justify-between shadow-sm bg-white px-6 min-h-[200px]`}
     >
       <svg width="102" height="32" viewBox="0 0 3490 1080">
         <path
