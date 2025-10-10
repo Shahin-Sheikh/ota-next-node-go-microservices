@@ -1,16 +1,24 @@
 "use client";
 import Link from "next/link";
 import { FaHouse } from "react-icons/fa6";
+import SearchBar from "../ui/search-bar/search-bar.component";
 
 const navItems = [
   {
-    label: "Home",
+    label: "Become a host",
     href: "/",
     icon: <FaHouse />,
   },
-  { label: "Browse", href: "/browse", icon: <FaHouse /> },
-  { label: "About", href: "/about", icon: <FaHouse /> },
-  { label: "Contact", href: "/contact", icon: <FaHouse /> },
+  {
+    label: "Help",
+    href: "/help",
+    icon: "help-circle",
+  },
+  {
+    label: "Sign up",
+    href: "/signup",
+    icon: "user",
+  },
 ];
 
 export default function Navbar() {
@@ -26,24 +34,29 @@ export default function Navbar() {
           ></path>
         </svg>
       </div>
-      <div className="flex justify-center gap-8">
-        <div className="flex gap-4 cursor-pointer">
-          <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[var(--text-secondary)]">
-            Home
-          </span>
+      <div className="justify-center items-center flex flex-col">
+        <div className="flex gap-8 mb-6">
+          <div className="flex gap-4 cursor-pointer">
+            <FaHouse size={45} color="#ff385c" />
+            <span className="pt-3 text-md text-[var(--text-secondary)]">
+              Home
+            </span>
+          </div>
+          <div className="flex gap-4 cursor-pointer">
+            <FaHouse size={45} color="#ff385c" />
+            <span className="pt-3 text-md text-[var(--text-secondary)]">
+              Home
+            </span>
+          </div>
+          <div className="flex gap-4 cursor-pointer">
+            <FaHouse size={45} color="#ff385c" />
+            <span className="pt-3 text-md text-[var(--text-secondary)]">
+              Home
+            </span>
+          </div>
         </div>
         <div className="flex gap-4 cursor-pointer">
-          <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[var(--text-secondary)]">
-            Home
-          </span>
-        </div>
-        <div className="flex gap-4 cursor-pointer">
-          <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[var(--text-secondary)]">
-            Home
-          </span>
+          <SearchBar />
         </div>
       </div>
 

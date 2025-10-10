@@ -1,37 +1,56 @@
 :root {
   /* Airbnb Brand Colors */
-  --color-primary: rgba(34, 34, 34, 1);
-  --color-primary-hover: rgba(68, 68, 68, 1);
-  --color-primary-light: rgba(102, 102, 102, 1);
-  --color-primary-dark: rgba(0, 0, 0, 1);
+  --color-primary-dark: rgba(34, 34, 34, 1);
+  --color-primary-dark-hover: rgba(0, 0, 0, 1);
+  --color-primary-pink: rgba(255, 56, 92, 1);
+  --color-primary-pink-hover: rgba(255, 0, 51, 1);
+  --color-primary-white: rgba(255, 255, 255, 1);
+  --color-primary-white-hover: rgba(245, 245, 245, 1);
+  --color-dark: rgba(51, 51, 51, 1);
+  --color-white: rgba(255, 255, 255, 1);
+  --color-dark-gray: rgba(119, 119, 119, 1);
+  --color-gray: rgba(170, 170, 170, 1);
+  --color-light-gray: rgba(204, 204, 204, 1);
+  --color-lightest-gray: rgba(242, 242, 242, 1);
+  --color-gray-foggy: rgba(128, 128, 128, 1);
+  --color-transparent: rgba(255, 255, 255, 0);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-backdrop: rgba(0, 0, 0, 0.7);
 
   /* Supporting Brand Colors */
-  --color-secondary: rgba(0, 166, 153, 1); /* Teal */
+  --color-secondary: rgba(0, 166, 153, 1);
   --color-secondary-hover: rgba(0, 132, 137, 1);
-  --color-accent: rgba(252, 100, 45, 1); /* Orange */
+  --color-accent: rgba(252, 100, 45, 1);
   --color-accent-hover: rgba(232, 82, 11, 1);
 
   /* Neutral Colors */
-  --color-black: rgba(34, 34, 34, 1);
-  --color-dark: rgba(51, 51, 51, 1);
-  --color-dark-gray: rgba(113, 113, 113, 1);
-  --color-gray: rgba(176, 176, 176, 1);
-  --color-light-gray: rgba(235, 235, 235, 1);
-  --color-lightest-gray: rgba(252, 252, 252, 1);
-  --color-gray-foggy: rgba(106, 106, 106, 1);
-  --color-white: rgba(255, 255, 255, 1);
+  --color-black: var(--color-primary-dark);
+  --color-dark: var(--color-dark);
+  --color-white: var(--color-white);
+  --color-dark-gray: var(--color-dark-gray);
+  --color-gray: var(--color-gray);
+  --color-light-gray: var(--color-light-gray);
+  --color-lightest-gray: var(--color-lightest-gray);
+  --color-gray-foggy: var(--color-gray-foggy);
+  --color-transparent: var(--color-transparent);
+  --color-overlay: var(--color-overlay);
+  --color-backdrop: var(--color-backdrop);
 
   /* Status Colors */
-  --color-success: rgba(0, 166, 153, 1);
-  --color-warning: rgba(255, 180, 0, 1);
-  --color-error: rgba(255, 90, 95, 1);
-  --color-info: rgba(0, 115, 230, 1);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+  --color-info: var(--color-info);
 
   /* Semantic color variables */
-  --primary: var(--color-primary);
-  --primary-hover: var(--color-primary-hover);
-  --primary-light: var(--color-primary-light);
+  --primary: var(--color-primary-dark);
+  --primary-hover: var(--color-primary-dark-hover);
+  --primary-light: var(--color-primary-dark-light);
   --primary-dark: var(--color-primary-dark);
+  --primary-pink: var(--color-primary-pink);
+  --primary-pink-hover: var(--color-primary-pink-hover);
+  --primary-white: var(--color-primary-white);
+  --primary-white-hover: var(--color-primary-white-hover);
 
   --secondary: var(--color-secondary);
   --secondary-hover: var(--color-secondary-hover);
