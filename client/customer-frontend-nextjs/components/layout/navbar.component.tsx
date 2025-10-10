@@ -14,11 +14,6 @@ const navItems = [
     href: "/help",
     icon: "help-circle",
   },
-  {
-    label: "Sign up",
-    href: "/signup",
-    icon: "user",
-  },
 ];
 
 export default function Navbar() {
