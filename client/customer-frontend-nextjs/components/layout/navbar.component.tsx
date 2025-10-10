@@ -16,7 +16,7 @@ const navItems = [
 export default function Navbar() {
   return (
     <nav
-      className={`flex flex-row w-full border-b border-gray-200 justify-between shadow-sm bg-[#fdfdfd] px-12 py-8 min-h-[200px]`}
+      className={`flex flex-row w-full border-b border-[#ebebeb] justify-between bg-[color:var(--background-alt)] px-12 py-8 min-h-[200px]`}
     >
       <div>
         <svg width="102" height="32" viewBox="0 0 3490 1080">
@@ -29,15 +29,21 @@ export default function Navbar() {
       <div className="flex justify-center gap-8">
         <div className="flex gap-4 cursor-pointer">
           <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[#888888]">Home</span>
+          <span className="pt-3 text-md text-[var(--text-secondary)]">
+            Home
+          </span>
         </div>
         <div className="flex gap-4 cursor-pointer">
           <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[#888888]">Home</span>
+          <span className="pt-3 text-md text-[var(--text-secondary)]">
+            Home
+          </span>
         </div>
         <div className="flex gap-4 cursor-pointer">
           <FaHouse size={45} color="#ff385c" />
-          <span className="pt-3 text-md text-[#888888]">Home</span>
+          <span className="pt-3 text-md text-[var(--text-secondary)]">
+            Home
+          </span>
         </div>
       </div>
 
@@ -51,9 +57,7 @@ export default function Navbar() {
             <svg className="h-4 w-4" fill="currentColor">
               <use xlinkHref={`#icon-${item.icon}`} />
             </svg>
-            <span className="text-md font-semibold text-[#000]">
-              {item.label}
-            </span>
+            <span className="text-md font-semibold">{item.label}</span>
           </Link>
         ))}
       </div>

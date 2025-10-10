@@ -1,30 +1,31 @@
 :root {
   /* Airbnb Brand Colors */
-  --color-primary: #ff385c; /* Rausch (Airbnb's signature pink) */
-  --color-primary-hover: #e31c5f;
-  --color-primary-light: #ff5a5f;
-  --color-primary-dark: #d70466;
+  --color-primary: rgba(34, 34, 34, 1);
+  --color-primary-hover: rgba(68, 68, 68, 1);
+  --color-primary-light: rgba(102, 102, 102, 1);
+  --color-primary-dark: rgba(0, 0, 0, 1);
 
   /* Supporting Brand Colors */
-  --color-secondary: #00a699; /* Teal */
-  --color-secondary-hover: #008489;
-  --color-accent: #fc642d; /* Orange */
-  --color-accent-hover: #e8520b;
+  --color-secondary: rgba(0, 166, 153, 1); /* Teal */
+  --color-secondary-hover: rgba(0, 132, 137, 1);
+  --color-accent: rgba(252, 100, 45, 1); /* Orange */
+  --color-accent-hover: rgba(232, 82, 11, 1);
 
   /* Neutral Colors */
-  --color-black: #222222;
-  --color-dark: #484848;
-  --color-dark-gray: #717171;
-  --color-gray: #b0b0b0;
-  --color-light-gray: #ebebeb;
-  --color-lightest-gray: #f7f7f7;
-  --color-white: #ffffff;
+  --color-black: rgba(34, 34, 34, 1);
+  --color-dark: rgba(51, 51, 51, 1);
+  --color-dark-gray: rgba(113, 113, 113, 1);
+  --color-gray: rgba(176, 176, 176, 1);
+  --color-light-gray: rgba(235, 235, 235, 1);
+  --color-lightest-gray: rgba(252, 252, 252, 1);
+  --color-gray-foggy: rgba(106, 106, 106, 1);
+  --color-white: rgba(255, 255, 255, 1);
 
   /* Status Colors */
-  --color-success: #00a699;
-  --color-warning: #ffb400;
-  --color-error: #ff5a5f;
-  --color-info: #0073e6;
+  --color-success: rgba(0, 166, 153, 1);
+  --color-warning: rgba(255, 180, 0, 1);
+  --color-error: rgba(255, 90, 95, 1);
+  --color-info: rgba(0, 115, 230, 1);
 
   /* Semantic color variables */
   --primary: var(--color-primary);
@@ -44,14 +45,14 @@
   --info: var(--color-info);
 
   --text-primary: var(--color-black);
-  --text-secondary: var(--color-dark-gray);
+  --text-secondary: var(--color-gray-foggy);
   --text-tertiary: var(--color-gray);
   --text-disabled: var(--color-light-gray);
 
   --background-main: var(--color-white);
   --background-alt: var(--color-lightest-gray);
   --background-elevated: var(--color-white);
-  --background-overlay: rgba(34, 34, 34, 0.6);
+  --background-overlay: var(--color-white);
 
   --border-light: var(--color-light-gray);
   --border-medium: var(--color-gray);
@@ -59,8 +60,8 @@
   --border-focus: var(--color-primary);
 
   /* Font variables - Airbnb style */
-  --font-primary: "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-primary: "Airbnb Cereal VF", "Circular", -apple-system,
+    BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
   --font-heading: "Cereal", "Circular", -apple-system, BlinkMacSystemFont,
     "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
@@ -104,7 +105,7 @@
   /* Navbar specific variables */
   --navbar-background: var(--color-white);
   --navbar-border: var(--border-light);
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --navbar-shadow: 0 1px 2px var(--color-black, 0.1);
   --navbar-height: 80px;
   --navbar-padding: 0 24px;
 }
@@ -121,23 +122,23 @@
   --text-tertiary: var(--color-gray);
   --text-disabled: var(--color-dark-gray);
 
-  --background-main: #121212;
-  --background-alt: #1e1e1e;
-  --background-elevated: #2a2a2a;
-  --background-overlay: rgba(255, 255, 255, 0.1);
+  --background-main: var(--color-black);
+  --background-alt: var(--color-dark-gray);
+  --background-elevated: var(--color-dark-gray);
+  --background-overlay: var(--color-white);
 
-  --border-light: #333333;
-  --border-medium: #444444;
-  --border-dark: #555555;
+  --border-light: var(--color-dark-gray);
+  --border-medium: var(--color-gray);
+  --border-dark: var(--color-light-gray);
   --border-focus: var(--color-primary);
 
   /* Adjusted shadows for dark theme */
-  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 8px 16px rgba(0, 0, 0, 0.4);
-  --shadow-modal: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 4px var(--color-black, 0.3);
+  --shadow-card-hover: 0 8px 16px var(--color-black, 0.4);
+  --shadow-modal: 0 8px 28px var(--color-black, 0.5);
 
   /* Dark theme navbar */
   --navbar-background: var(--background-elevated);
   --navbar-border: var(--border-light);
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --navbar-shadow: 0 1px 2px var(--color-black, 0.4);
 }
