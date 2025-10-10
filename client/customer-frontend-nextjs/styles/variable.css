@@ -23,19 +23,6 @@
   --color-accent: rgba(252, 100, 45, 1);
   --color-accent-hover: rgba(232, 82, 11, 1);
 
-  /* Neutral Colors */
-  --color-black: var(--color-primary-dark);
-  --color-dark: var(--color-dark);
-  --color-white: var(--color-white);
-  --color-dark-gray: var(--color-dark-gray);
-  --color-gray: var(--color-gray);
-  --color-light-gray: var(--color-light-gray);
-  --color-lightest-gray: var(--color-lightest-gray);
-  --color-gray-foggy: var(--color-gray-foggy);
-  --color-transparent: var(--color-transparent);
-  --color-overlay: var(--color-overlay);
-  --color-backdrop: var(--color-backdrop);
-
   /* Status Colors */
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);

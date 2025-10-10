@@ -24,7 +24,10 @@ const navItems = [
 export default function Navbar() {
   return (
     <nav
-      className={`flex flex-row w-full border-b border-[#ebebeb] justify-between bg-[color:var(--background-alt)] px-12 py-8 min-h-[200px]`}
+      className="flex flex-row w-full border-b border-[#ebebeb] justify-between px-12 py-8 min-h-[200px]"
+      style={{
+        background: "linear-gradient(180deg, #ffffff 39.9%, #f8f8f8 100%))",
+      }}
     >
       <div>
         <svg width="102" height="32" viewBox="0 0 3490 1080">
