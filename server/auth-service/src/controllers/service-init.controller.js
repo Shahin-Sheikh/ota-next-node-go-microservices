@@ -7,7 +7,7 @@ exports.initializeService = async (req, res) => {
   try {
     const { serviceName, serviceSecret, allowedDomains } = req.body;
 
-    if (!["admin", "hotel", "inventory", "shipping"].includes(serviceName)) {
+    if (!["admin", "hotel", "customer", "crm"].includes(serviceName)) {
       return res.status(400).json({
         success: false,
         message: "Invalid service name",
