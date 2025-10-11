@@ -5,7 +5,7 @@ const serviceRegistrySchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    enum: ["admin", "hotel", "customer", "crm"],
+    enum: ["admin", "hotel", "crm"],
   },
   serviceSecret: {
     type: String,
