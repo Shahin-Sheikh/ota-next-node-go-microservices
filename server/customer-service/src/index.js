@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const connectDB = require("./config/db.config");
+const { connectDB } = require("./config/db.config"); // Add destructuring
 
 dotenv.config();
 

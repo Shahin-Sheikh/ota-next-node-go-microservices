@@ -2,15 +2,16 @@ const hotelServiceClient = require("../services/hotel-service-client.service");
 
 module.exports = {
   searchHotels: async (req, res) => {
+    console.log("Search query:", req);
     try {
       const { destination, checkInDate, checkOutDate, guests, sortBy } =
         req.query;
 
-      if (!destination || !checkInDate || !checkOutDate) {
-        return res.status(400).json({
-          error: "Destination, check-in and check-out dates are required",
-        });
-      }
+      // if (!destination || !checkInDate || !checkOutDate) {
+      //   return res.status(400).json({
+      //     error: "Destination, check-in and check-out dates are required",
+      //   });
+      // }
 
       const results = await hotelServiceClient.searchHotels({
         destination,

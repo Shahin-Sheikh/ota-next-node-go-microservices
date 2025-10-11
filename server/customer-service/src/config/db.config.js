@@ -1,18 +1,19 @@
 const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME || "master",
-  process.env.DB_USER || "SA",
-  process.env.DB_PASSWORD || "Shahin@885",
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: process.env.DB_HOST || "localhost",
+    host: process.env.DB_HOST,
     dialect: "mssql",
-    port: process.env.DB_PORT || 1433,
+    port: process.env.DB_PORT,
     logging: false,
     dialectOptions: {
       options: {
-        encrypt: false, // Use this if you're on Windows Azure
-        trustServerCertificate: true, // Use this if you have self-signed certificate
+        encrypt: false,
+        trustServerCertificate: true,
       },
     },
   }
@@ -27,5 +28,8 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
-module.exports.sequelize = sequelize;
+module.exports = {
+  connectDB,
+  sequelize,
+  HOTEL_SERVICE_URL: process.env.HOTEL_SERVICE_URL,
+};
