@@ -1,27 +1,14 @@
 "use client";
-import Link from "next/link";
-import { FaHouse } from "react-icons/fa6";
+import Image from "next/image";
 import SearchBar from "../ui/search-bar/search-bar.component";
-
-const navItems = [
-  {
-    label: "Become a host",
-    href: "/",
-    icon: <FaHouse />,
-  },
-  {
-    label: "Help",
-    href: "/help",
-    icon: "help-circle",
-  },
-];
 
 export default function Navbar() {
   return (
     <nav
       className="flex flex-row w-full border-b border-[#ebebeb] justify-between px-12 py-8 min-h-[200px]"
       style={{
-        background: "linear-gradient(180deg, #ffffff 39.9%, #f8f8f8 100%))",
+        background:
+          "var(--search-input_background, linear-gradient(180deg, #ffffff 39.9%, #f8f8f8 100%))",
       }}
     >
       <div>
@@ -34,22 +21,37 @@ export default function Navbar() {
       </div>
       <div className="justify-center items-center flex flex-col">
         <div className="flex gap-8 mb-6">
-          <div className="flex gap-4 cursor-pointer">
-            <FaHouse size={45} color="#ff385c" />
-            <span className="pt-3 text-md text-[var(--text-secondary)]">
+          <div className="flex gap-1 cursor-pointer">
+            <Image
+              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/b5a7ef95-2d3a-4aaa-b9d7-6f8c4a91aa2d.png"
+              alt="home"
+              width={45}
+              height={45}
+            />
+            <span className="pt-4 text-sm text-[var(--text-secondary)]">
               Home
             </span>
           </div>
-          <div className="flex gap-4 cursor-pointer">
-            <FaHouse size={45} color="#ff385c" />
-            <span className="pt-3 text-md text-[var(--text-secondary)]">
-              Home
+          <div className="flex gap-1 cursor-pointer">
+            <Image
+              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/02579423-5d4b-4c71-bedb-0ea18cd293f8.png"
+              alt="home"
+              width={45}
+              height={45}
+            />
+            <span className="pt-4 text-sm text-[var(--text-secondary)]">
+              Experiences
             </span>
           </div>
-          <div className="flex gap-4 cursor-pointer">
-            <FaHouse size={45} color="#ff385c" />
-            <span className="pt-3 text-md text-[var(--text-secondary)]">
-              Home
+          <div className="flex gap-1 cursor-pointer">
+            <Image
+              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/1de966ec-197f-4b72-bbb1-cf4c91876dfa.png"
+              alt="home"
+              width={45}
+              height={45}
+            />
+            <span className="pt-4 text-sm text-[var(--text-secondary)]">
+              Services
             </span>
           </div>
         </div>
@@ -59,18 +61,7 @@ export default function Navbar() {
       </div>
 
       <div className="flex gap-4">
-        {navItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="text-gray-700 hover:text-gray-900 flex flex-col items-center text-sm"
-          >
-            <svg className="h-4 w-4" fill="currentColor">
-              <use xlinkHref={`#icon-${item.icon}`} />
-            </svg>
-            <span className="text-md font-semibold">{item.label}</span>
-          </Link>
-        ))}
+        <div className=""></div>
       </div>
     </nav>
   );
