@@ -1,6 +1,7 @@
 "use client";
 
 import SearchButton from "../buttons/search-button.component";
+import "../../../styles/custom-css/search-bar.css";
 
 export default function SearchBar() {
   const serachBarContent = [
@@ -12,7 +13,7 @@ export default function SearchBar() {
     { label: "Who", subLabels: "Add guests" },
   ];
   return (
-    <div className="min-w-[850px] min-h-[66px] shadow-lg border border-gray-300 bg-[#fff] rounded-full px-2 py-2 hover:shadow-md transition-shadow duration-200">
+    <div className="search-container min-w-[850px] min-h-[66px] shadow-lg border border-gray-300 bg-[#fff] rounded-full px-2 py-2 hover:shadow-md transition-shadow duration-200">
       <div className="flex flex-row gap-2 justify-between items-center">
         {serachBarContent.map((item, index) => (
           <div
@@ -24,7 +25,7 @@ export default function SearchBar() {
             }`}
           >
             <div
-              className={`flex flex-col justify-center items-start gap-1 ${
+              className={`search-item flex flex-col justify-center items-start gap-1 ${
                 index === 0 ? "ml-4" : ""
               }`}
             >

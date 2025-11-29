@@ -1,0 +1,5 @@
+.search-container .search-item:hover {
+  background-color: var(--primary-white-hover);
+  padding: 10px;
+  border-radius: var(--radius-lg);
+}
