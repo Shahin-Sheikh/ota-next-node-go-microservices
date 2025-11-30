@@ -6,6 +6,11 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const { connectDB } = require("./config/db.config");
 const swaggerSpec = require("./config/swagger.config");
+const {
+  connectConsumer,
+  disconnectConsumer,
+} = require("./config/kafka.config");
+const kafkaConsumer = require("./services/kafka-consumer.service");
 
 dotenv.config();
 
@@ -86,7 +91,10 @@ app.get("/api-docs.json", (req, res) => {
 
 // Load routes
 const customerRoutes = require("./routes/customer.route");
+const hotelRoutes = require("./routes/hotel.route");
+
 app.use("/api/customers", customerRoutes);
+app.use("/api/hotels", hotelRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -128,15 +136,21 @@ app.use((err, req, res, next) => {
 });
 
 // Server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`🚀 Customer Service running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
   console.log(`🔒 Environment: ${process.env.NODE_ENV || "development"}`);
+
+  // Connect Kafka Consumer and start listening
+  await connectConsumer();
+  await kafkaConsumer.startConsumer();
 });
 
 // Graceful shutdown
-process.on("SIGTERM", () => {
+process.on("SIGTERM", async () => {
   console.log("SIGTERM signal received: closing HTTP server");
+  await kafkaConsumer.stopConsumer();
+  await disconnectConsumer();
   server.close(() => {
     console.log("HTTP server closed");
     process.exit(0);
