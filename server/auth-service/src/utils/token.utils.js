@@ -22,7 +22,13 @@ const generateTokens = (id, userType) => {
 };
 
 // Add refresh token to user
-const addRefreshToken = async (user, refreshToken, userType) => {
+const addRefreshToken = async (
+  user,
+  refreshToken,
+  userType,
+  ipAddress = null,
+  userAgent = null
+) => {
   const expires = new Date();
   expires.setDate(expires.getDate() + 7); // 7 days
 
@@ -31,11 +37,26 @@ const addRefreshToken = async (user, refreshToken, userType) => {
       ? CustomerUser
       : createServiceUserModel(user.service);
 
+  // Limit number of active refresh tokens per user (max 5 devices)
+  const tokenCount = await UserModel.findById(user._id).select("refreshTokens");
+  if (
+    tokenCount &&
+    tokenCount.refreshTokens &&
+    tokenCount.refreshTokens.length >= 5
+  ) {
+    // Remove oldest token
+    await UserModel.findByIdAndUpdate(user._id, {
+      $pop: { refreshTokens: -1 },
+    });
+  }
+
   await UserModel.findByIdAndUpdate(user._id, {
     $push: {
       refreshTokens: {
         token: refreshToken,
         expires,
+        ipAddress,
+        userAgent,
       },
     },
   });
