@@ -274,6 +274,8 @@ exports.loginServiceUser = async (req, res) => {
 
     // Reset login attempts on successful login
     await user.resetLoginAttempts();
+
+    // Update last login info
     await ServiceUser.findByIdAndUpdate(user._id, {
       lastLogin: Date.now(),
       lastLoginIp: ipAddress,

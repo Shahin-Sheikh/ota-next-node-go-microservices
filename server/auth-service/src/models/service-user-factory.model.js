@@ -23,6 +23,10 @@ const serviceUserSchemaDefinition = {
       createdAt: { type: Date, default: Date.now },
     },
   ],
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Date },
+  lastLogin: { type: Date },
+  lastLoginIp: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 };
@@ -42,6 +46,39 @@ module.exports = function (serviceName) {
 
   schema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+  };
+
+  // Check if user is locked
+  schema.virtual("isLocked").get(function () {
+    return !!(this.lockUntil && this.lockUntil > Date.now());
+  });
+
+  // Increment login attempts
+  schema.methods.incLoginAttempts = function () {
+    // If lock has expired, restart count
+    if (this.lockUntil && this.lockUntil < Date.now()) {
+      return this.updateOne({
+        $set: { loginAttempts: 1 },
+        $unset: { lockUntil: 1 },
+      });
+    }
+    // Otherwise increment
+    const updates = { $inc: { loginAttempts: 1 } };
+    // Lock account after 5 failed attempts for 2 hours
+    const maxAttempts = 5;
+    const lockTime = 2 * 60 * 60 * 1000; // 2 hours
+    if (this.loginAttempts + 1 >= maxAttempts && !this.isLocked) {
+      updates.$set = { lockUntil: Date.now() + lockTime };
+    }
+    return this.updateOne(updates);
+  };
+
+  // Reset login attempts on successful login
+  schema.methods.resetLoginAttempts = function () {
+    return this.updateOne({
+      $set: { loginAttempts: 0 },
+      $unset: { lockUntil: 1 },
+    });
   };
 
   schema.pre("save", async function (next) {
