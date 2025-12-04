@@ -1,4 +1,7 @@
-import apiClient from "@/lib/api-client";
+import axios from "axios";
+
+const AUTH_BASE_URL =
+  import.meta.env.VITE_API_AUTH_URL || "http://localhost:5001";
 
 export interface LoginCredentials {
   email: string;
@@ -18,25 +21,70 @@ export interface AuthResponse {
   data: {
     id: string;
     email: string;
-    name: string;
+    name?: string;
+    firstName?: string;
+    lastName?: string;
+    service?: string;
   };
 }
 
 export interface User {
   id: string;
   email: string;
-  name: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  service?: string;
 }
 
 class AuthService {
   /**
-   * Login user with email and password
+   * Login service user with email and password (for hotel, admin, etc.)
    * Stores tokens in localStorage and returns user data
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>(
-      "/api/auth/customer/login",
-      credentials
+    const serviceSecret = import.meta.env.VITE_SERVICE_SECRET;
+
+    if (!serviceSecret) {
+      throw new Error("Service secret not configured");
+    }
+
+    const response = await axios.post<AuthResponse>(
+      `${AUTH_BASE_URL}/api/auth/service/login`,
+      credentials,
+      {
+        headers: {
+          "service-secret": serviceSecret,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+
+    const { accessToken, refreshToken, data } = response.data;
+
+    // Store tokens
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("user", JSON.stringify(data));
+
+    return response.data;
+  }
+
+  /**
+   * Login customer with email and password
+   * Stores tokens in localStorage and returns user data
+   */
+  async loginCustomer(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await axios.post<AuthResponse>(
+      `${AUTH_BASE_URL}/api/auth/customer/login`,
+      credentials,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
     );
 
     const { accessToken, refreshToken, data } = response.data;
@@ -53,9 +101,15 @@ class AuthService {
    * Register new user
    */
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>(
-      "/api/auth/customer/register",
-      credentials
+    const response = await axios.post<AuthResponse>(
+      `${AUTH_BASE_URL}/api/auth/customer/register`,
+      credentials,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
     );
 
     const { accessToken, refreshToken, data } = response.data;
@@ -77,7 +131,14 @@ class AuthService {
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (refreshToken) {
-        await apiClient.post("/api/auth/logout", { refreshToken });
+        await axios.post(
+          `${AUTH_BASE_URL}/api/auth/logout`,
+          { refreshToken },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -99,9 +160,13 @@ class AuthService {
       throw new Error("No refresh token available");
     }
 
-    const response = await apiClient.post<{ accessToken: string }>(
-      "/api/auth/token/refresh",
-      { refreshToken }
+    const response = await axios.post<{ accessToken: string }>(
+      `${AUTH_BASE_URL}/api/auth/token/refresh`,
+      { refreshToken },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
     );
 
     const { accessToken } = response.data;

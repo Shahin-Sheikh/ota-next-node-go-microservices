@@ -1,14 +1,58 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Hotel } from "lucide-react";
+import { toast } from "sonner";
+import { authService } from "@/services/auth.service";
+import { useAuth } from "@/contexts/auth.context";
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login submitted:", { email, password });
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // Validate inputs
+      if (!email || !password) {
+        setError("Please enter both email and password");
+        toast.error("Please enter both email and password");
+        return;
+      }
+
+      // Call login API
+      const response = await authService.login({ email, password });
+
+      // Update auth context
+      setUser(response.data);
+
+      // Show success message
+      toast.success("Login successful! Welcome back.");
+
+      // Redirect to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+
+      // Handle error messages
+      const errorMessage =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ||
+        (err as Error)?.message ||
+        "Login failed. Please check your credentials.";
+
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,7 +71,14 @@ function LoginPage() {
       </div>
 
       {/* Form */}
-      <div className="space-y-5 sm:space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
         {/* Email Input */}
         <div className="space-y-2">
           <label
@@ -44,7 +95,8 @@ function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-white/50 backdrop-blur-sm border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              disabled={isLoading}
+              className="w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-white/50 backdrop-blur-sm border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               required
             />
           </div>
@@ -66,7 +118,8 @@ function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full pl-10 pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-white/50 backdrop-blur-sm border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              disabled={isLoading}
+              className="w-full pl-10 pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-white/50 backdrop-blur-sm border border-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               required
             />
             <button
@@ -99,12 +152,13 @@ function LoginPage() {
 
         {/* Submit Button */}
         <button
-          onClick={handleSubmit}
-          className="w-full py-2.5 sm:py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-2.5 sm:py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          Sign In
+          {isLoading ? "Signing in..." : "Sign In"}
         </button>
-      </div>
+      </form>
 
       {/* Footer */}
       <div className="mt-5 sm:mt-6 text-center text-xs sm:text-sm text-gray-600">
