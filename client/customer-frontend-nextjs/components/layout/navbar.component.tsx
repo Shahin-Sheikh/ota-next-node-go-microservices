@@ -1,8 +1,29 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 import SearchBar from "../ui/search-bar/search-bar.component";
 
 export default function Navbar() {
+  const [activeTab, setActiveTab] = useState("home");
+
+  const tabs = [
+    {
+      id: "home",
+      label: "Home",
+      icon: "https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/b5a7ef95-2d3a-4aaa-b9d7-6f8c4a91aa2d.png",
+    },
+    {
+      id: "experiences",
+      label: "Experiences",
+      icon: "https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/02579423-5d4b-4c71-bedb-0ea18cd293f8.png",
+    },
+    {
+      id: "services",
+      label: "Services",
+      icon: "https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/1de966ec-197f-4b72-bbb1-cf4c91876dfa.png",
+    },
+  ];
+
   return (
     <nav
       className="flex flex-row w-full border-b border-[#ebebeb] justify-between px-12 py-8 min-h-[200px]"
@@ -21,39 +42,36 @@ export default function Navbar() {
       </div>
       <div className="justify-center items-center flex flex-col">
         <div className="flex gap-8 mb-6">
-          <div className="flex gap-1 cursor-pointer">
-            <Image
-              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/b5a7ef95-2d3a-4aaa-b9d7-6f8c4a91aa2d.png"
-              alt="home"
-              width={45}
-              height={45}
-            />
-            <span className="pt-4 text-sm text-[var(--text-secondary)]">
-              Home
-            </span>
-          </div>
-          <div className="flex gap-1 cursor-pointer">
-            <Image
-              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/02579423-5d4b-4c71-bedb-0ea18cd293f8.png"
-              alt="home"
-              width={45}
-              height={45}
-            />
-            <span className="pt-4 text-sm text-[var(--text-secondary)]">
-              Experiences
-            </span>
-          </div>
-          <div className="flex gap-1 cursor-pointer">
-            <Image
-              src="https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-ActivitySetup/original/1de966ec-197f-4b72-bbb1-cf4c91876dfa.png"
-              alt="home"
-              width={45}
-              height={45}
-            />
-            <span className="pt-4 text-sm text-[var(--text-secondary)]">
-              Services
-            </span>
-          </div>
+          {tabs.map((tab) => (
+            <div
+              key={tab.id}
+              className={`flex gap-1 cursor-pointer pb-3 border-b-2 transition-all ${
+                activeTab === tab.id
+                  ? "border-[#222222]"
+                  : "border-transparent hover:border-gray-300"
+              }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <Image
+                src={tab.icon}
+                alt={tab.label}
+                width={45}
+                height={45}
+                className={`transition-opacity ${
+                  activeTab === tab.id ? "opacity-100" : "opacity-60"
+                }`}
+              />
+              <span
+                className={`pt-4 text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? "text-[#222222] font-semibold"
+                    : "text-[var(--text-secondary)]"
+                }`}
+              >
+                {tab.label}
+              </span>
+            </div>
+          ))}
         </div>
         <div className="flex gap-4 cursor-pointer">
           <SearchBar />
