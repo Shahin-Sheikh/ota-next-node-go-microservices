@@ -55,99 +55,99 @@ const menuItems = [
   {
     title: "Bookings",
     icon: Calendar,
-    url: "/dashboard/bookings",
+    url: "/bookings",
     children: [
       {
         title: "All Bookings",
-        url: "/dashboard/bookings/all",
+        url: "/bookings/all",
       },
       {
         title: "Check-ins Today",
-        url: "/dashboard/bookings/checkins",
+        url: "/bookings/checkins",
       },
       {
         title: "Check-outs Today",
-        url: "/dashboard/bookings/checkouts",
+        url: "/bookings/checkouts",
       },
       {
         title: "Pending Confirmation",
-        url: "/dashboard/bookings/pending",
+        url: "/bookings/pending",
       },
     ],
   },
   {
     title: "Rooms",
     icon: Building2,
-    url: "/dashboard/rooms",
+    url: "/rooms",
     children: [
       {
         title: "Room List",
-        url: "/dashboard/rooms/list",
+        url: "/rooms/list",
       },
       {
         title: "Room Types",
-        url: "/dashboard/rooms/types",
+        url: "/rooms/types",
       },
       {
         title: "Availability",
-        url: "/dashboard/rooms/availability",
+        url: "/rooms/availability",
       },
       {
         title: "Maintenance",
-        url: "/dashboard/rooms/maintenance",
+        url: "/rooms/maintenance",
       },
     ],
   },
   {
     title: "Guests",
     icon: Users,
-    url: "/dashboard/guests",
+    url: "/guests",
     children: [
       {
         title: "All Guests",
-        url: "/dashboard/guests/all",
+        url: "/guests/all",
       },
       {
         title: "VIP Guests",
-        url: "/dashboard/guests/vip",
+        url: "/guests/vip",
       },
       {
         title: "Guest Reviews",
-        url: "/dashboard/guests/reviews",
+        url: "/guests/reviews",
       },
     ],
   },
   {
     title: "Analytics",
     icon: BarChart3,
-    url: "/dashboard/analytics",
+    url: "/analytics",
   },
   {
     title: "Messages",
     icon: MessageSquare,
-    url: "/dashboard/messages",
+    url: "/messages",
   },
   {
     title: "Notifications",
     icon: Bell,
-    url: "/dashboard/notifications",
+    url: "/notifications",
   },
   {
     title: "Payments",
     icon: CreditCard,
-    url: "/dashboard/payments",
+    url: "/payments",
     children: [
       {
         title: "Transactions",
-        url: "/dashboard/payments/transactions",
+        url: "/payments/transactions",
       },
       {
         title: "Invoices",
-        url: "/dashboard/payments/invoices",
+        url: "/payments/invoices",
       },
       {
         title: "Refunds",
-        url: "/dashboard/payments/refunds",
+        url: "/payments/refunds",
       },
     ],
   },
@@ -157,23 +157,23 @@ const settingsItems = [
   {
     title: "Settings",
     icon: Settings,
-    url: "/dashboard/settings",
+    url: "/settings",
     children: [
       {
         title: "General",
-        url: "/dashboard/settings/general",
+        url: "/settings/general",
       },
       {
         title: "Hotel Details",
-        url: "/dashboard/settings/hotel",
+        url: "/settings/hotel",
       },
       {
         title: "Users & Roles",
-        url: "/dashboard/settings/users",
+        url: "/settings/users",
       },
       {
         title: "Integrations",
-        url: "/dashboard/settings/integrations",
+        url: "/settings/integrations",
       },
     ],
   },
