@@ -2,7 +2,8 @@ const db = require("../models");
 const Hotel = db.Hotel;
 const Room = db.Room;
 const { Op } = require("sequelize");
-const kafkaProducer = require("../services/kafka-producer.service");
+// TODO: Kafka is disabled for now, will be enabled later
+// const kafkaProducer = require("../services/kafka-producer.service");
 
 // Admin CRUD Operations
 const createHotel = async (req, res) => {
@@ -12,7 +13,8 @@ const createHotel = async (req, res) => {
     const hotel = await Hotel.create(hotelData);
 
     // Publish event to Kafka
-    await kafkaProducer.publishHotelCreated(hotel.toJSON());
+    // TODO: Kafka is disabled for now, will be enabled later
+    // await kafkaProducer.publishHotelCreated(hotel.toJSON());
 
     res.status(201).json({
       data: hotel,
@@ -77,7 +79,8 @@ const updateHotel = async (req, res) => {
       const updatedHotel = await Hotel.findByPk(req.params.id);
 
       // Publish event to Kafka
-      await kafkaProducer.publishHotelUpdated(updatedHotel.toJSON());
+      // TODO: Kafka is disabled for now, will be enabled later
+      // await kafkaProducer.publishHotelUpdated(updatedHotel.toJSON());
 
       return res.json({
         data: updatedHotel,
@@ -97,7 +100,8 @@ const activateHotel = async (req, res) => {
     );
     if (updated) {
       // Publish event to Kafka
-      await kafkaProducer.publishHotelStatusChanged(req.params.id, "active");
+      // TODO: Kafka is disabled for now, will be enabled later
+      // await kafkaProducer.publishHotelStatusChanged(req.params.id, "active");
 
       return res.json({ message: "Hotel activated" });
     }
@@ -115,7 +119,8 @@ const deactivateHotel = async (req, res) => {
     );
     if (updated) {
       // Publish event to Kafka
-      await kafkaProducer.publishHotelStatusChanged(req.params.id, "inactive");
+      // TODO: Kafka is disabled for now, will be enabled later
+      // await kafkaProducer.publishHotelStatusChanged(req.params.id, "inactive");
 
       return res.json({ message: "Hotel deactivated" });
     }

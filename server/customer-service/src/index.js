@@ -6,11 +6,12 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const { connectDB } = require("./config/db.config");
 const swaggerSpec = require("./config/swagger.config");
-const {
-  connectConsumer,
-  disconnectConsumer,
-} = require("./config/kafka.config");
-const kafkaConsumer = require("./services/kafka-consumer.service");
+// TODO: Kafka is disabled for now, will be enabled later
+// const {
+//   connectConsumer,
+//   disconnectConsumer,
+// } = require("./config/kafka.config");
+// const kafkaConsumer = require("./services/kafka-consumer.service");
 
 dotenv.config();
 
@@ -142,15 +143,17 @@ const server = app.listen(PORT, async () => {
   console.log(`🔒 Environment: ${process.env.NODE_ENV || "development"}`);
 
   // Connect Kafka Consumer and start listening
-  await connectConsumer();
-  await kafkaConsumer.startConsumer();
+  // TODO: Kafka is disabled for now, will be enabled later
+  // await connectConsumer();
+  // await kafkaConsumer.startConsumer();
 });
 
 // Graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("SIGTERM signal received: closing HTTP server");
-  await kafkaConsumer.stopConsumer();
-  await disconnectConsumer();
+  // TODO: Kafka is disabled for now, will be enabled later
+  // await kafkaConsumer.stopConsumer();
+  // await disconnectConsumer();
   server.close(() => {
     console.log("HTTP server closed");
     process.exit(0);

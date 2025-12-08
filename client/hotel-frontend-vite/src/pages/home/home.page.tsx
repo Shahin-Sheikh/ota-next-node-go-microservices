@@ -44,7 +44,7 @@ export default function HomePage() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+              <div className="p-6 bg-linear-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">
                   Total Bookings
                 </h3>
@@ -54,7 +54,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+              <div className="p-6 bg-linear-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
                 <h3 className="text-lg font-semibold text-purple-900 mb-2">
                   Revenue
                 </h3>
@@ -64,7 +64,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg border border-pink-200">
+              <div className="p-6 bg-linear-to-br from-pink-50 to-pink-100 rounded-lg border border-pink-200">
                 <h3 className="text-lg font-semibold text-pink-900 mb-2">
                   Occupancy Rate
                 </h3>

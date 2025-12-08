@@ -5,10 +5,11 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger.config");
-const {
-  connectProducer,
-  disconnectProducer,
-} = require("./config/kafka.config");
+// TODO: Kafka is disabled for now, will be enabled later
+// const {
+//   connectProducer,
+//   disconnectProducer,
+// } = require("./config/kafka.config");
 
 dotenv.config();
 
@@ -133,7 +134,8 @@ db.sequelize
   .sync({ alter: true })
   .then(async () => {
     // Connect Kafka Producer
-    await connectProducer();
+    // TODO: Kafka is disabled for now, will be enabled later
+    // await connectProducer();
 
     const server = app.listen(PORT, () => {
       console.log(`🚀 Hotel Service running on port ${PORT}`);
@@ -144,7 +146,8 @@ db.sequelize
     // Graceful shutdown
     process.on("SIGTERM", async () => {
       console.log("SIGTERM signal received: closing HTTP server");
-      await disconnectProducer();
+      // TODO: Kafka is disabled for now, will be enabled later
+      // await disconnectProducer();
       server.close(() => {
         console.log("HTTP server closed");
         process.exit(0);
